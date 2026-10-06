@@ -161,7 +161,7 @@ def sync_sources(conn, config):
 
 def main():
     config = json.loads(SOURCES_PATH.read_text(encoding="utf-8"))
-    rss_sources = [
+    configured_rss_sources = [
         s for s in config["sources"]
         if s.get("enabled", True) and s.get("type") == "rss"
     ]
@@ -169,6 +169,29 @@ def main():
     with psycopg.connect(DATABASE_URL, autocommit=False, prepare_threshold=None) as conn:
         init_db(conn)
         sync_sources(conn, config)
+
+        # Respect per-source collection cadence. Render can wake every 30 minutes
+        # while noisier/rate-limited feeds (e.g. Reddit, GovInfo) run less often.
+        now = utcnow()
+        rss_sources = []
+        skipped = []
+        with conn.cursor() as cur:
+            for source in configured_rss_sources:
+                min_interval = int(source.get("min_interval_minutes", 30))
+                cur.execute(
+                    "SELECT last_checked_at FROM sources WHERE source_id=%s",
+                    (source["id"],)
+                )
+                row = cur.fetchone()
+                last_checked = row[0] if row else None
+                due = (
+                    last_checked is None or
+                    (now - last_checked) >= dt.timedelta(minutes=min_interval)
+                )
+                if due:
+                    rss_sources.append(source)
+                else:
+                    skipped.append(source["id"])
 
         with conn.cursor() as cur:
             cur.execute("""
@@ -178,6 +201,9 @@ def main():
             """, (len(rss_sources),))
             run_id = cur.fetchone()[0]
         conn.commit()
+
+        if skipped:
+            print(f"SKIP {len(skipped)} not due: {', '.join(skipped)}")
 
         succeeded = failed = parsed_total = inserted_total = 0
 
@@ -250,7 +276,8 @@ def main():
         conn.commit()
 
         print(
-            f"DONE run={run_id} sources={len(rss_sources)} "
+            f"DONE run={run_id} due_sources={len(rss_sources)} "
+            f"configured_sources={len(configured_rss_sources)} "
             f"succeeded={succeeded} failed={failed} "
             f"parsed={parsed_total} inserted={inserted_total}"
         )
