@@ -6,9 +6,15 @@ services:
     plan: starter
     schedule: "*/30 * * * *"
     buildCommand: pip install -r requirements.txt
-    startCommand: python ingest.py
+    startCommand: python ingest.py && python email_ingest.py
     envVars:
       - key: DATABASE_URL
         sync: false
       - key: APP_ENV
         value: production
+      - key: GMAIL_ADDRESS
+        sync: false
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+      - key: GMAIL_LOOKBACK_DAYS
+        value: "7"
