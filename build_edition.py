@@ -6,6 +6,7 @@ import json
 import os
 from collections import defaultdict
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import psycopg
 
@@ -14,6 +15,8 @@ GUIDE_PATH=ROOT/"taste_guide.json"
 DATABASE_URL=os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise SystemExit("DATABASE_URL is required")
+
+EASTERN=ZoneInfo("America/New_York")
 
 SECTION_ORDER=[
     "dc_local","dc_politics","us_politics","dc_dining",
@@ -57,83 +60,142 @@ def ensure_table(conn):
         """)
     conn.commit()
 
+def fetch_rows(conn):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT sc.id,sc.beat,sc.title,sc.score,sc.item_count,sc.source_count,
+                   sc.first_seen,sc.latest_seen,sc.metadata,
+                   i.source_name,i.editorial_type,i.url,i.summary,i.metadata
+            FROM story_clusters sc
+            JOIN items i ON i.id=sc.canonical_item_id
+            WHERE sc.latest_seen >= NOW() - INTERVAL '48 hours'
+            ORDER BY sc.score DESC, sc.latest_seen DESC
+        """)
+        return cur.fetchall()
+
+def row_to_story(r):
+    cid,beat,title,score,item_count,source_count,first_seen,latest_seen,cluster_meta,source_name,etype,url,summary,item_meta=r
+    item_meta=item_meta or {}
+    return {
+        "cluster_id":cid,
+        "title":title,
+        "score":score,
+        "source":source_name,
+        "editorial_type":etype,
+        "url":url,
+        "summary":summary or "",
+        "image_url":item_meta.get("image_url") or "",
+        "item_count":item_count,
+        "source_count":source_count,
+        "first_seen":first_seen.isoformat() if first_seen else None,
+        "latest_seen":latest_seen.isoformat() if latest_seen else None
+    }
+
+def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=None):
+    grouped=defaultdict(list)
+
+    for r in rows:
+        if edition_type=="evening" and cutoff_utc is not None:
+            latest=r[7]
+            if latest is None or latest < cutoff_utc:
+                continue
+        grouped[r[1]].append(r)
+
+    # If the evening pool is too thin, include top recent carryovers from the last 24h.
+    if edition_type=="evening":
+        evening_count=sum(len(v) for v in grouped.values())
+        if evening_count < 10:
+            for r in rows:
+                beat=r[1]
+                if r in grouped.get(beat,[]):
+                    continue
+                if r[7] and r[7] >= now_utc - dt.timedelta(hours=24):
+                    grouped[beat].append(r)
+
+    sections=[]
+    total=0
+
+    for beat in SECTION_ORDER:
+        cap=int(caps.get(beat,4))
+        pool=grouped.get(beat,[])
+        reported=[r for r in pool if r[10] != "primary_source"]
+        primary=[r for r in pool if r[10] == "primary_source"]
+        primary_cap = 2 if beat in {"us_politics","dc_politics"} else 1
+        selected=(reported[:cap] + primary[:primary_cap])[:cap]
+        if not selected:
+            continue
+
+        stories=[row_to_story(r) for r in selected]
+        sections.append({
+            "beat":beat,
+            "name":SECTION_NAMES.get(beat,beat),
+            "stories":stories
+        })
+        total+=len(stories)
+
+    return {
+        "edition_type":edition_type,
+        "edition_date":edition_date.isoformat(),
+        "generated_at":now_utc.isoformat(),
+        "story_count":total,
+        "sections":sections
+    }
+
+def upsert_edition(conn, edition_type, edition_date, payload):
+    with conn.cursor() as cur:
+        cur.execute("""
+            INSERT INTO editions(edition_type,edition_date,payload)
+            VALUES (%s,%s,%s::jsonb)
+            ON CONFLICT (edition_type,edition_date) DO UPDATE SET
+                generated_at=NOW(),payload=EXCLUDED.payload
+        """,(edition_type,edition_date,json.dumps(payload)))
+    conn.commit()
+
+def edition_exists(conn, edition_type, edition_date):
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT 1 FROM editions WHERE edition_type=%s AND edition_date=%s",
+            (edition_type,edition_date)
+        )
+        return cur.fetchone() is not None
+
+def print_payload(payload):
+    print(
+        f"EDITION {payload['edition_type']} {payload['edition_date']}: "
+        f"{payload['story_count']} stories across {len(payload['sections'])} sections",
+        flush=True
+    )
+    for section in payload["sections"]:
+        print(f"SECTION {section['beat']}: {len(section['stories'])} stories", flush=True)
+        for story in section["stories"][:3]:
+            print(f"  {story['score']:>3} | {story['title']}", flush=True)
+
 def main():
     guide=json.loads(GUIDE_PATH.read_text(encoding="utf-8"))
     caps=guide.get("beat_caps",{})
-    now=dt.datetime.now(dt.timezone.utc)
-    edition_type=os.environ.get("EDITION_TYPE","morning")
-    edition_date=now.date()
+    now_utc=dt.datetime.now(dt.timezone.utc)
+    now_et=now_utc.astimezone(EASTERN)
+    edition_date=now_et.date()
+
+    # Noon Eastern freezes the morning issue and starts the evening-change window.
+    noon_et=dt.datetime.combine(edition_date, dt.time(12,0), tzinfo=EASTERN)
+    noon_utc=noon_et.astimezone(dt.timezone.utc)
 
     with psycopg.connect(DATABASE_URL, autocommit=False, prepare_threshold=None) as conn:
         ensure_table(conn)
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT sc.id,sc.beat,sc.title,sc.score,sc.item_count,sc.source_count,
-                       sc.first_seen,sc.latest_seen,sc.metadata,
-                       i.source_name,i.editorial_type,i.url,i.summary
-                FROM story_clusters sc
-                JOIN items i ON i.id=sc.canonical_item_id
-                WHERE sc.latest_seen >= NOW() - INTERVAL '48 hours'
-                ORDER BY sc.score DESC, sc.latest_seen DESC
-            """)
-            rows=cur.fetchall()
+        rows=fetch_rows(conn)
 
-        grouped=defaultdict(list)
-        for r in rows:
-            grouped[r[1]].append(r)
+        if now_et.hour < 12 or not edition_exists(conn,"morning",edition_date):
+            morning=build_payload(rows,caps,"morning",edition_date,now_utc)
+            upsert_edition(conn,"morning",edition_date,morning)
+            print_payload(morning)
+        else:
+            print(f"EDITION morning {edition_date}: frozen after noon ET", flush=True)
 
-        sections=[]
-        total=0
-        for beat in SECTION_ORDER:
-            cap=int(caps.get(beat,4))
-            pool=grouped.get(beat,[])
-            reported=[r for r in pool if r[10] != "primary_source"]
-            primary=[r for r in pool if r[10] == "primary_source"]
-            primary_cap = 2 if beat in {"us_politics","dc_politics"} else 1
-            selected=(reported[:cap] + primary[:primary_cap])[:cap]
-            if not selected:
-                continue
-            stories=[]
-            for r in selected:
-                cid,_,title,score,item_count,source_count,first_seen,latest_seen,meta,source_name,etype,url,summary=r
-                stories.append({
-                    "cluster_id":cid,
-                    "title":title,
-                    "score":score,
-                    "source":source_name,
-                    "editorial_type":etype,
-                    "url":url,
-                    "summary":summary or "",
-                    "item_count":item_count,
-                    "source_count":source_count,
-                    "first_seen":first_seen.isoformat() if first_seen else None,
-                    "latest_seen":latest_seen.isoformat() if latest_seen else None
-                })
-            sections.append({"beat":beat,"name":SECTION_NAMES.get(beat,beat),"stories":stories})
-            total+=len(stories)
-
-        payload={
-            "edition_type":edition_type,
-            "edition_date":edition_date.isoformat(),
-            "generated_at":now.isoformat(),
-            "story_count":total,
-            "sections":sections
-        }
-
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO editions(edition_type,edition_date,payload)
-                VALUES (%s,%s,%s::jsonb)
-                ON CONFLICT (edition_type,edition_date) DO UPDATE SET
-                    generated_at=NOW(),payload=EXCLUDED.payload
-            """,(edition_type,edition_date,json.dumps(payload)))
-        conn.commit()
-
-        print(f"EDITION {edition_type} {edition_date}: {total} stories across {len(sections)} sections", flush=True)
-        for section in sections:
-            print(f"SECTION {section['beat']}: {len(section['stories'])} stories", flush=True)
-            for story in section["stories"][:3]:
-                print(f"  {story['score']:>3} | {story['title']}", flush=True)
+        if now_et.hour >= 12:
+            evening=build_payload(rows,caps,"evening",edition_date,now_utc,cutoff_utc=noon_utc)
+            upsert_edition(conn,"evening",edition_date,evening)
+            print_payload(evening)
 
 if __name__=="__main__":
     main()
