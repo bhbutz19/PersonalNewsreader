@@ -12,6 +12,7 @@ import re
 from email.header import decode_header, make_header
 from email.utils import parsedate_to_datetime, parseaddr
 from html.parser import HTMLParser
+from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
@@ -117,13 +118,28 @@ def normalize_url(url):
 def extract_links(msg, filters):
     _, html_parts = message_parts(msg)
     candidates = []
+
+    # Prefer BeautifulSoup because many newsletters use deeply nested tables,
+    # tracking redirects, encoded entities, and image/title link pairs.
     for h in html_parts:
-        parser = AnchorParser()
         try:
-            parser.feed(h)
+            soup = BeautifulSoup(h, "html.parser")
+            for a in soup.find_all("a", href=True):
+                title = " ".join(a.stripped_strings).strip()
+                href = a.get("href", "")
+                if not title:
+                    img = a.find("img")
+                    if img and img.get("alt"):
+                        title = img.get("alt", "").strip()
+                candidates.append((title, href))
         except Exception:
-            continue
-        candidates.extend(parser.links)
+            # Fallback to the simple stdlib parser.
+            parser = AnchorParser()
+            try:
+                parser.feed(h)
+                candidates.extend(parser.links)
+            except Exception:
+                pass
 
     reject_text = [x.lower() for x in filters.get("reject_text", [])]
     reject_domains = [x.lower() for x in filters.get("reject_domains", [])]
@@ -132,7 +148,7 @@ def extract_links(msg, filters):
     out = []
 
     for title, href in candidates:
-        title = re.sub(r"\s+", " ", title).strip()
+        title = re.sub(r"\\s+", " ", html.unescape(title or "")).strip()
         href = normalize_url(href)
         if len(title) < min_len or not href:
             continue
@@ -297,7 +313,9 @@ def main():
 
                 if rule and rule.get("extract_articles"):
                     source_id = rule["source_id"]
-                    for title, href in extract_links(msg, filters):
+                    links = extract_links(msg, filters)
+                    print(f"EMAIL {rule['name']}: {subject!r} -> {len(links)} usable links", flush=True)
+                    for title, href in links:
                         if title.lower() == subject.lower():
                             continue
                         item_fp = item_fingerprint(source_id, title, href)
