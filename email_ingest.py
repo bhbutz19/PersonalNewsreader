@@ -152,6 +152,8 @@ def extract_links(msg, filters):
         href = normalize_url(href)
         if len(title) < min_len or not href:
             continue
+        if not headline_like(title):
+            continue
         lower = title.lower()
         if any(x in lower for x in reject_text):
             continue
@@ -200,8 +202,43 @@ def message_fingerprint(message_id, uid, sender, subject, received_at):
                       received_at.isoformat() if received_at else ""])
     return hashlib.sha256(basis.encode("utf-8")).hexdigest()
 
+def normalize_title(value):
+    value = html.unescape(value or "")
+    value = re.sub(r"\\s+", " ", value).strip().lower()
+    value = re.sub(r"[^a-z0-9áéíóúñüàèìòùç'’ -]+", "", value)
+    return value
+
+def headline_like(title):
+    t = re.sub(r"\\s+", " ", html.unescape(title or "")).strip()
+    low = t.lower()
+    if len(t) < 14 or len(t) > 220:
+        return False
+    if len(re.findall(r"[A-Za-zÀ-ÿ0-9]+", t)) < 3:
+        return False
+    reject_exact = {
+        "read more", "read the full article", "learn more", "click here",
+        "view in browser", "view this email in your browser", "subscribe",
+        "unsubscribe", "manage preferences", "sign up", "donate",
+        "advertise", "contact us", "follow us", "instagram", "facebook",
+        "twitter", "x", "youtube", "linkedin", "privacy policy"
+    }
+    if low in reject_exact:
+        return False
+    reject_contains = (
+        "unsubscribe", "manage preferences", "view in browser",
+        "privacy policy", "advertise with", "email preferences",
+        "forward to a friend", "sponsored by", "paid for by"
+    )
+    if any(x in low for x in reject_contains):
+        return False
+    return True
+
 def item_fingerprint(source_id, title, url):
-    return hashlib.sha256(f"{source_id}|{title}|{url}".encode("utf-8")).hexdigest()
+    # Newsletter tracking URLs change from send to send.  A stable source +
+    # normalized headline fingerprint prevents the same story from becoming
+    # multiple items just because it appeared in another newsletter.
+    basis = f"{source_id}|{normalize_title(title)}"
+    return hashlib.sha256(basis.encode("utf-8")).hexdigest()
 
 def ensure_tables(conn):
     with conn.cursor() as cur:
@@ -314,7 +351,9 @@ def main():
                 if rule and rule.get("extract_articles"):
                     source_id = rule["source_id"]
                     links = extract_links(msg, filters)
-                    print(f"EMAIL {rule['name']}: {subject!r} -> {len(links)} usable links", flush=True)
+                    max_links = int(rule.get("max_article_links", 30))
+                    links = links[:max_links]
+                    print(f"EMAIL {rule['name']}: {subject!r} -> {len(links)} headline candidates", flush=True)
                     for title, href in links:
                         if title.lower() == subject.lower():
                             continue
@@ -326,6 +365,7 @@ def main():
                             "newsletter_subject": subject,
                             "forwarded": is_forwarded,
                             "original_sender": original_sender,
+                            "extraction_version": 2,
                         }
                         with conn.cursor() as cur:
                             cur.execute("""
