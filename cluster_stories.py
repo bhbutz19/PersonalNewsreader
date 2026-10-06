@@ -129,8 +129,17 @@ def main():
             cur.execute("TRUNCATE story_cluster_items, story_clusters RESTART IDENTITY")
             for c in clusters:
                 canonical=c["canonical"]
-                key=f"{c['beat']}|{norm_title(c['title'])[:220]}"
-                meta={"canonical_source":canonical[4],"editorial_type":canonical[7],"url":canonical[8]}
+                normalized = norm_title(c["title"])[:220]
+                if normalized:
+                    key = f"{c['beat']}|{normalized}"
+                else:
+                    key = f"{c['beat']}|item-{canonical[0]}"
+                meta={
+                    "canonical_source":canonical[4],
+                    "editorial_type":canonical[7],
+                    "url":canonical[8],
+                    "normalized_title":normalized,
+                }
                 cur.execute("""
                     INSERT INTO story_clusters (
                         cluster_key,beat,canonical_item_id,title,score,item_count,source_count,
