@@ -165,6 +165,12 @@ def main():
         ensure_table(conn)
         with conn.cursor() as cur:
             cur.execute("""
+                DELETE FROM editorial_scores es
+                USING items i
+                WHERE es.item_id=i.id
+                  AND COALESCE(i.published_at,i.fetched_at) >= NOW() - INTERVAL '8 days'
+            """)
+            cur.execute("""
                 SELECT i.id,i.source_id,i.source_name,i.beat,i.editorial_type,i.title,
                        i.published_at,i.fetched_at,i.metadata,s.priority
                 FROM items i
