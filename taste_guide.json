@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "weights": {
+    "personal_relevance": 30,
+    "importance": 25,
+    "novelty": 15,
+    "source_quality": 15,
+    "local_specificity": 10,
+    "conversation_value": 5
+  },
+  "beat_relevance": {
+    "dc_local": 30,
+    "dc_politics": 30,
+    "dc_dining": 28,
+    "milwaukee": 24,
+    "wisconsin": 24,
+    "wisconsin_politics": 24,
+    "cedarburg": 28,
+    "packers": 26,
+    "brewers": 24,
+    "uwm": 24,
+    "f1": 24,
+    "spain": 20,
+    "menorca": 28,
+    "logrono": 26,
+    "real_estate": 24,
+    "cooking": 18,
+    "sailing": 18,
+    "us_politics": 24
+  },
+  "source_quality": {
+    "primary_source": 15,
+    "official": 15,
+    "primary": 14,
+    "conversation": 4
+  },
+  "editorial_quality": {
+    "primary_source": 6,
+    "reported_news": 5,
+    "official_team": 4,
+    "newsletter": 3,
+    "social": 0
+  },
+  "beat_caps": {
+    "dc_local": 8,
+    "dc_politics": 8,
+    "us_politics": 10,
+    "dc_dining": 5,
+    "milwaukee": 5,
+    "wisconsin": 5,
+    "wisconsin_politics": 4,
+    "packers": 4,
+    "brewers": 4,
+    "uwm": 4,
+    "f1": 5,
+    "spain": 5,
+    "menorca": 6,
+    "logrono": 5,
+    "real_estate": 5,
+    "cooking": 4,
+    "sailing": 4
+  },
+  "special_boosts": {
+    "primary_source": 10,
+    "manual_pick": 10,
+    "original_reporting": 5
+  }
+}
