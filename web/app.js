@@ -13,14 +13,14 @@ const edition = {
     "Spain now draws from the dedicated El País España feed"
   ],
   stories: [
-    {section:"NATIONAL",title:"Trump Announces a Plan to Send $90 Checks to Millions of Medicare Recipients",deck:"A policy proposal leads the national politics section after primary-document noise is filtered out.",source:"Washington Sun",age:"2h ago"},
-    {section:"D.C. DINING",title:"District 7 Bar & Grill",deck:"A new local dining item makes the cut as national Eater noise falls away.",source:"Eater DC",age:"4h ago"},
-    {section:"MILWAUKEE",title:"MKE Airport Celebrates 100 Years of Flight!",deck:"Milwaukee marks a century of aviation with a local milestone story.",source:"Urban Milwaukee",age:"3h ago"},
-    {section:"WISCONSIN",title:"Wisconsin Morning Brief",deck:"Statewide reporting is now filtered to remove newsletter utility fragments.",source:"WPR",age:"3h ago"},
-    {section:"PACKERS",title:"Inbox: Hopefully, the Packers did both Sunday",deck:"Green Bay analysis leads the Packers section, with repeat stories clustered together.",source:"Packers.com",age:"5h ago"},
-    {section:"BREWERS",title:"Brewers–Padres NLDS Game 3 FAQ",deck:"The latest postseason matchup information from the Brewers’ official feed.",source:"MLB.com",age:"4h ago"},
-    {section:"FORMULA 1",title:"F1 fashion goes local as Ferrari, McLaren and Mercedes celebrate Singapore",deck:"The paddock shifts attention to Singapore as teams lean into the local scene.",source:"Motorsport.com",age:"3h ago"},
-    {section:"SPAIN",title:"El Rey pide que la UE afronte unida las amenazas “vengan de donde vengan”",deck:"The Spain section now uses the dedicated El País España feed.",source:"El País",age:"2h ago"}
+    {section:"NATIONAL",title:"Trump Announces a Plan to Send $90 Checks to Millions of Medicare Recipients",deck:"A policy proposal leads the national politics section after primary-document noise is filtered out.",source:"Washington Sun",age:"2h ago",type:"News"},
+    {section:"D.C. DINING",title:"District 7 Bar & Grill",deck:"A new local dining item makes the cut as national Eater noise falls away.",source:"Eater DC",age:"4h ago",type:"News"},
+    {section:"MILWAUKEE",title:"MKE Airport Celebrates 100 Years of Flight!",deck:"Milwaukee marks a century of aviation with a local milestone story.",source:"Urban Milwaukee",age:"3h ago",type:"News"},
+    {section:"WISCONSIN",title:"Wisconsin Morning Brief",deck:"Statewide reporting is now filtered to remove newsletter utility fragments.",source:"WPR",age:"3h ago",type:"News"},
+    {section:"PACKERS",title:"Inbox: Hopefully, the Packers did both Sunday",deck:"Green Bay analysis leads the Packers section, with repeat stories clustered together.",source:"Packers.com",age:"5h ago",type:"Analysis"},
+    {section:"BREWERS",title:"Brewers–Padres NLDS Game 3 FAQ",deck:"The latest postseason matchup information from the Brewers’ official feed.",source:"MLB.com",age:"4h ago",type:"News"},
+    {section:"FORMULA 1",title:"F1 fashion goes local as Ferrari, McLaren and Mercedes celebrate Singapore",deck:"The paddock shifts attention to Singapore as teams lean into the local scene.",source:"Motorsport.com",age:"3h ago",type:"Analysis"},
+    {section:"SPAIN",title:"El Rey pide que la UE afronte unida las amenazas “vengan de donde vengan”",deck:"The Spain section now uses the dedicated El País España feed.",source:"El País",age:"2h ago",type:"News"}
   ]
 };
 
@@ -71,7 +71,7 @@ edition.stories.forEach(story=>{
   node.querySelector(".story-kicker").textContent=story.section;
   node.querySelector("h3").textContent=story.title;
   node.querySelector(".story-deck").textContent=story.deck;
-  node.querySelector(".story-meta").textContent=`${story.source} · ${story.age}`;
+  node.querySelector(".story-meta").innerHTML=`<span class="story-source">${story.source}</span> · ${story.age}<span class="editorial-badge">${story.type || "News"}</span>`;
   grid.appendChild(node);
 });
 
