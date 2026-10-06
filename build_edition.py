@@ -86,7 +86,11 @@ def main():
         total=0
         for beat in SECTION_ORDER:
             cap=int(caps.get(beat,4))
-            selected=grouped.get(beat,[])[:cap]
+            pool=grouped.get(beat,[])
+            reported=[r for r in pool if r[10] != "primary_source"]
+            primary=[r for r in pool if r[10] == "primary_source"]
+            primary_cap = 2 if beat in {"us_politics","dc_politics"} else 1
+            selected=(reported[:cap] + primary[:primary_cap])[:cap]
             if not selected:
                 continue
             stories=[]
