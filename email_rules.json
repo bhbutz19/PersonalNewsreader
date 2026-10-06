@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "name": "Urban Milwaukee",
+      "subject_regex": "^Urban Milwaukee",
+      "beat": "milwaukee",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "WPR Wisconsin Today",
+      "subject_regex": "^Wisconsin Today:",
+      "beat": "wisconsin",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "Wisconsin Watch Forward",
+      "subject_regex": "^(Forward:|The Act 10 saga)",
+      "beat": "wisconsin_politics",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "Menorca Es Diari",
+      "subject_regex": "^Las claves de Es Diari$",
+      "beat": "menorca",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "Eater DC",
+      "subject_regex": "(Eater DC|D\\.C\\.|new openings|best dishes)",
+      "beat": "dc_dining",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "Washington Sun",
+      "subject_regex": "(What They’re Talking About|Campaign .*DC|PAC Off|Final Countdown)",
+      "beat": "us_politics",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "Politico",
+      "subject_regex": "(SCOTUS|Obama returns|Buttigieg|DOJ subpoenas)",
+      "beat": "us_politics",
+      "editorial_type": "reported_news"
+    },
+    {
+      "name": "Cooking",
+      "subject_regex": "(recipes|favorite foods|Eater editors)",
+      "beat": "cooking",
+      "editorial_type": "newsletter"
+    }
+  ]
+}
