@@ -70,7 +70,7 @@ def main():
             cur.execute("""
                 SELECT sc.id,sc.beat,sc.title,sc.score,sc.item_count,sc.source_count,
                        sc.first_seen,sc.latest_seen,sc.metadata,
-                       i.source_name,i.editorial_type,i.url
+                       i.source_name,i.editorial_type,i.url,i.summary
                 FROM story_clusters sc
                 JOIN items i ON i.id=sc.canonical_item_id
                 WHERE sc.latest_seen >= NOW() - INTERVAL '48 hours'
@@ -95,7 +95,7 @@ def main():
                 continue
             stories=[]
             for r in selected:
-                cid,_,title,score,item_count,source_count,first_seen,latest_seen,meta,source_name,etype,url=r
+                cid,_,title,score,item_count,source_count,first_seen,latest_seen,meta,source_name,etype,url,summary=r
                 stories.append({
                     "cluster_id":cid,
                     "title":title,
@@ -103,6 +103,7 @@ def main():
                     "source":source_name,
                     "editorial_type":etype,
                     "url":url,
+                    "summary":summary or "",
                     "item_count":item_count,
                     "source_count":source_count,
                     "first_seen":first_seen.isoformat() if first_seen else None,
