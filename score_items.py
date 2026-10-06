@@ -77,7 +77,7 @@ def score_item(row, guide, now):
     importance += eq
 
     if editorial_type == "primary_source":
-        importance += 8
+        importance += 2
         reasons.append("primary source")
     if priority == "official":
         reasons.append("official source")
@@ -97,6 +97,13 @@ def score_item(row, guide, now):
     if any(x in low for x in ("opinion", "sponsored", "advertisement")):
         importance -= 10
         reasons.append("promotional/opinion penalty")
+    if source_id.startswith("govinfo_") and (
+        low.startswith("federal register vol.")
+        or low.startswith("congressional record volume")
+        or low.startswith("serial no.")
+    ):
+        importance -= 8
+        reasons.append("raw government compilation penalty")
 
     components = {
         "personal_relevance": clamp(personal,0,30),
