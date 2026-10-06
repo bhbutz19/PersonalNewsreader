@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "sources": [
     {
       "id": "popville",
@@ -9,7 +9,8 @@
       "url": "https://www.popville.com/feed/",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "dc_council_calendar",
@@ -19,7 +20,8 @@
       "url": "https://dccouncil.us/events/feed/",
       "priority": "primary_source",
       "editorial_type": "primary_source",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "packers_news",
@@ -29,7 +31,8 @@
       "url": "https://www.packers.com/rss/news",
       "priority": "official",
       "editorial_type": "official_team",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "uwm_campus",
@@ -39,7 +42,8 @@
       "url": "https://uwm.edu/news/section/campus-community/feed/",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "elpais_spain",
@@ -49,7 +53,8 @@
       "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "reddit_greenbaypackers",
@@ -60,7 +65,8 @@
       "priority": "conversation",
       "editorial_type": "social",
       "enabled": true,
-      "notes": "Conversation source only; never authoritative for factual claims."
+      "notes": "Conversation source only; never authoritative for factual claims. Poll every 3 hours to reduce 429 rate limiting.",
+      "min_interval_minutes": 180
     },
     {
       "id": "reddit_brewers",
@@ -71,7 +77,8 @@
       "priority": "conversation",
       "editorial_type": "social",
       "enabled": true,
-      "notes": "Conversation source only; never authoritative for factual claims."
+      "notes": "Conversation source only; never authoritative for factual claims. Poll every 3 hours to reduce 429 rate limiting.",
+      "min_interval_minutes": 180
     },
     {
       "id": "motorsport_f1",
@@ -81,7 +88,8 @@
       "url": "https://www.motorsport.com/rss/f1/news/",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "govinfo",
@@ -132,7 +140,8 @@
       "url": "https://www.mlb.com/brewers/feeds/news/rss.xml",
       "priority": "official",
       "editorial_type": "official_team",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "eater_dc",
@@ -142,7 +151,8 @@
       "url": "https://dc.eater.com/rss/index.xml",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 30
     },
     {
       "id": "dc_council_hearings_archive",
@@ -152,7 +162,8 @@
       "url": "https://dc.granicus.com/VPodcast.php?view_id=2",
       "priority": "primary_source",
       "editorial_type": "primary_source",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 60
     },
     {
       "id": "govinfo_presidential_documents",
@@ -162,7 +173,8 @@
       "url": "https://www.govinfo.gov/rss/dcpd.xml",
       "priority": "primary_source",
       "editorial_type": "primary_source",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 120
     },
     {
       "id": "govinfo_congressional_hearings",
@@ -172,7 +184,8 @@
       "url": "https://www.govinfo.gov/rss/chrg.xml",
       "priority": "primary_source",
       "editorial_type": "primary_source",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 120
     },
     {
       "id": "govinfo_congressional_record",
@@ -182,7 +195,8 @@
       "url": "https://www.govinfo.gov/rss/crec.xml",
       "priority": "primary_source",
       "editorial_type": "primary_source",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 120
     },
     {
       "id": "govinfo_federal_register",
@@ -192,7 +206,8 @@
       "url": "https://www.govinfo.gov/rss/fr.xml",
       "priority": "primary_source",
       "editorial_type": "primary_source",
-      "enabled": true
+      "enabled": true,
+      "min_interval_minutes": 120
     },
     {
       "id": "uwm_panthers_web",
