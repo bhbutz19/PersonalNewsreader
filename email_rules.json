@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -8,7 +8,8 @@
       "subject_regex": "^Urban Milwaukee",
       "beat": "milwaukee",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 22
     },
     {
       "name": "WPR Wisconsin Today",
@@ -17,7 +18,9 @@
       "subject_regex": "^Wisconsin Today:",
       "beat": "wisconsin",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 12,
+      "title_reject_regex": "(?i)^(according to|to learn more|from |read more|listen to|support for|photo:|credit:)"
     },
     {
       "name": "Wisconsin Watch Forward",
@@ -26,7 +29,9 @@
       "subject_regex": "^(Forward:|The Act 10 saga)",
       "beat": "wisconsin_politics",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 12,
+      "title_reject_regex": "(?i)^(according to|to learn more|from |read more|listen to|support for|photo:|credit:)"
     },
     {
       "name": "Menorca Es Diari",
@@ -35,7 +40,8 @@
       "subject_regex": "^Las claves de Es Diari$",
       "beat": "menorca",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 10
     },
     {
       "name": "Eater DC",
@@ -44,7 +50,9 @@
       "subject_regex": "(Eater DC|D\\.C\\.|new openings|best dishes)",
       "beat": "dc_dining",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 12,
+      "title_reject_regex": "(?i)(Los Angeles|Manhattan|Portland, Oregon|OpenWeb|Download the app|Eater editors ate recently)"
     },
     {
       "name": "Washington Sun",
@@ -53,7 +61,9 @@
       "subject_regex": "(What They’re Talking About|Campaign .*DC|PAC Off|Final Countdown)",
       "beat": "us_politics",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 15,
+      "title_reject_regex": "(?i)^(download the app|listen now|read more|view online|manage |follow |sign up)"
     },
     {
       "name": "Politico",
@@ -62,7 +72,9 @@
       "subject_regex": "(SCOTUS|Obama returns|Buttigieg|DOJ subpoenas)",
       "beat": "us_politics",
       "editorial_type": "reported_news",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 18,
+      "title_reject_regex": "(?i)^(download the app|listen now|read more|view online|manage |follow |sign up)"
     },
     {
       "name": "Cooking",
@@ -71,7 +83,9 @@
       "subject_regex": "(recipes|favorite foods|Eater editors)",
       "beat": "cooking",
       "editorial_type": "newsletter",
-      "extract_articles": true
+      "extract_articles": true,
+      "max_article_links": 10,
+      "title_reject_regex": "(?i)(OpenWeb|Download the app|all the new openings in Portland)"
     }
   ],
   "link_filters": {
