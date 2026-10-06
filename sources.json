@@ -1,0 +1,129 @@
+{
+  "version": 2,
+  "sources": [
+    {
+      "id": "popville",
+      "name": "PoPville",
+      "beat": "dc_local",
+      "type": "rss",
+      "url": "https://www.popville.com/feed/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true
+    },
+    {
+      "id": "dc_council_calendar",
+      "name": "DC Council Calendar",
+      "beat": "dc_politics",
+      "type": "rss",
+      "url": "https://dccouncil.us/events/feed/",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": true
+    },
+    {
+      "id": "packers_news",
+      "name": "Green Bay Packers News",
+      "beat": "packers",
+      "type": "rss",
+      "url": "https://www.packers.com/rss/news",
+      "priority": "official",
+      "editorial_type": "official_team",
+      "enabled": true
+    },
+    {
+      "id": "uwm_campus",
+      "name": "UWM Campus & Community",
+      "beat": "uwm",
+      "type": "rss",
+      "url": "https://uwm.edu/news/section/campus-community/feed/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true
+    },
+    {
+      "id": "elpais_spain",
+      "name": "El País — España",
+      "beat": "spain",
+      "type": "rss",
+      "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true
+    },
+    {
+      "id": "reddit_greenbaypackers",
+      "name": "Reddit — r/GreenBayPackers new",
+      "beat": "packers",
+      "type": "rss",
+      "url": "https://www.reddit.com/r/GreenBayPackers/new/.rss",
+      "priority": "conversation",
+      "editorial_type": "social",
+      "enabled": false,
+      "notes": "Enable after validating rate behavior."
+    },
+    {
+      "id": "reddit_brewers",
+      "name": "Reddit — r/Brewers new",
+      "beat": "brewers",
+      "type": "rss",
+      "url": "https://www.reddit.com/r/Brewers/new/.rss",
+      "priority": "conversation",
+      "editorial_type": "social",
+      "enabled": false,
+      "notes": "Enable after validating rate behavior."
+    },
+    {
+      "id": "motorsport_f1",
+      "name": "Motorsport.com Formula 1",
+      "beat": "f1",
+      "type": "web_registry",
+      "url": "https://www.motorsport.com/rss/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": false,
+      "notes": "Exact Formula 1 feed endpoint to validate before enabling."
+    },
+    {
+      "id": "govinfo",
+      "name": "GovInfo",
+      "beat": "us_politics",
+      "type": "web_registry",
+      "url": "https://www.govinfo.gov/feeds",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": false,
+      "notes": "Add targeted custom feeds rather than ingesting everything."
+    },
+    {
+      "id": "urban_milwaukee",
+      "name": "Urban Milwaukee",
+      "beat": "milwaukee",
+      "type": "email",
+      "url": "https://urbanmilwaukee.com/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": false
+    },
+    {
+      "id": "washington_sun",
+      "name": "The Washington Sun",
+      "beat": "dc_local",
+      "type": "email",
+      "url": "https://www.washingtonsun.com/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": false
+    },
+    {
+      "id": "menorca_esdiari",
+      "name": "Menorca — Es Diari",
+      "beat": "menorca",
+      "type": "email",
+      "url": "https://www.menorca.info/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": false
+    }
+  ]
+}
