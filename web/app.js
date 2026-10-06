@@ -115,14 +115,14 @@ function toViewModel(record) {
   const brief = [...remaining]
     .sort((a,b) => (b.score || 0) - (a.score || 0))
     .slice(0, 3)
-    .map(x => x.title);
+    .map(x => x.summary || x.title);
 
   const stories = [];
   const perSection = new Map();
 
   for (const row of remaining) {
     const count = perSection.get(row.beat) || 0;
-    if (count >= 3) continue;
+    if (count >= 2) continue;
     stories.push({
       section: row.section,
       title: row.title,
@@ -133,7 +133,7 @@ function toViewModel(record) {
       url: row.url || ""
     });
     perSection.set(row.beat, count + 1);
-    if (stories.length >= 24) break;
+    if (stories.length >= 18) break;
   }
 
   return {
@@ -203,7 +203,96 @@ function storyLinkEnd(url) {
   return url ? "</a>" : "";
 }
 
+
+function savedKey(story) {
+  return story.url || `${story.section}|${story.title}`;
+}
+
+function getSaved() {
+  try { return JSON.parse(localStorage.getItem("morningPaperSaved") || "[]"); }
+  catch { return []; }
+}
+
+function setSaved(items) {
+  localStorage.setItem("morningPaperSaved", JSON.stringify(items));
+}
+
+function isSaved(story) {
+  const key = savedKey(story);
+  return getSaved().some(x => x.key === key);
+}
+
+function toggleSaved(story) {
+  const key = savedKey(story);
+  let items = getSaved();
+  const exists = items.some(x => x.key === key);
+  if (exists) items = items.filter(x => x.key !== key);
+  else items.unshift({key, ...story});
+  setSaved(items);
+  return !exists;
+}
+
+function renderSavedView() {
+  const items = getSaved();
+  document.getElementById("lead").innerHTML = "";
+  document.getElementById("briefing").innerHTML = `
+    <div class="kicker">SAVED</div>
+    <h2>Your Saved Stories</h2>
+    <p>${items.length ? "Stories you bookmarked on this device." : "No saved stories yet."}</p>
+  `;
+  const grid = document.getElementById("sectionGrid");
+  grid.innerHTML = "";
+  const tpl = document.getElementById("storyCardTemplate");
+  items.forEach(story => {
+    const node = tpl.content.cloneNode(true);
+    const card=node.querySelector(".story-card");
+    card.dataset.section=story.section || "SAVED";
+    node.querySelector(".story-kicker").textContent=story.section || "SAVED";
+    const h3=node.querySelector("h3");
+    if(story.url){
+      const a=document.createElement("a");
+      a.href=story.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=story.title;
+      h3.appendChild(a);
+    }else h3.textContent=story.title;
+    const deck=node.querySelector(".story-deck");
+    deck.textContent=story.deck || "";
+    if(!story.deck) deck.style.display="none";
+    node.querySelector(".story-meta").innerHTML=`<span class="story-source">${story.source || ""}</span><button class="inline-save saved">Saved</button>`;
+    grid.appendChild(node);
+  });
+}
+
+function renderSectionsView() {
+  document.getElementById("lead").innerHTML = "";
+  document.getElementById("briefing").innerHTML = `
+    <div class="kicker">SECTIONS</div>
+    <h2>Browse the Paper</h2>
+    <p>Jump directly to the beats in your personal edition.</p>
+  `;
+  const grid=document.getElementById("sectionGrid");
+  grid.innerHTML="";
+  const names=[...new Set(currentEdition.stories.map(x=>x.section))];
+  names.forEach(name=>{
+    const article=document.createElement("article");
+    article.className="section-tile";
+    article.innerHTML=`<div class="kicker">${name}</div><h3>${currentEdition.stories.filter(x=>x.section===name).length} stories</h3>`;
+    article.onclick=()=>{
+      renderEdition(currentEdition,currentIsLive);
+      setTimeout(()=>{
+        [...document.querySelectorAll(".story-card")].find(c=>c.dataset.section===name)?.scrollIntoView({behavior:"smooth",block:"start"});
+      },0);
+    };
+    grid.appendChild(article);
+  });
+}
+
+
+let currentEdition = demoEdition;
+let currentIsLive = false;
+
 function renderEdition(edition, live) {
+  currentEdition = edition;
+  currentIsLive = live;
   document.getElementById("issueDate").textContent = edition.date;
   const status = document.getElementById("liveStatus");
   status.textContent = live ? "LIVE EDITION" : "DEMO EDITION";
@@ -220,11 +309,10 @@ function renderEdition(edition, live) {
         <span>${edition.lead.source}</span>
         ${edition.lead.age ? `<span>•</span><span>${edition.lead.age}</span>` : ""}
         <span class="editorial-badge">${edition.lead.type || "News"}</span>
+        <button id="leadSave" class="inline-save">${isSaved(edition.lead) ? "Saved" : "Save"}</button>
       </div>
     </div>
-    <div class="lead-art" role="img" aria-label="Editorial illustration">
-      <div class="art-caption">${live ? "Live Morning Edition" : "Morning Edition"} · ${edition.lead.section}</div>
-    </div>
+    ${live ? "" : `<div class="lead-art" role="img" aria-label="Editorial illustration"><div class="art-caption">Morning Edition · ${edition.lead.section}</div></div>`}
   `;
 
   document.getElementById("briefing").innerHTML = `
@@ -237,6 +325,14 @@ function renderEdition(edition, live) {
   const grid = document.getElementById("sectionGrid");
   const tpl = document.getElementById("storyCardTemplate");
   grid.innerHTML = "";
+
+  document.getElementById("leadSave")?.addEventListener("click",(e)=>{
+    e.preventDefault();
+    const btn=e.currentTarget;
+    const nowSaved=toggleSaved(edition.lead);
+    btn.textContent=nowSaved ? "Saved" : "Save";
+    btn.classList.toggle("saved",nowSaved);
+  });
 
   edition.stories.forEach(story => {
     const node = tpl.content.cloneNode(true);
@@ -259,7 +355,14 @@ function renderEdition(edition, live) {
     deck.textContent = story.deck || "";
     if (!story.deck) deck.style.display = "none";
     node.querySelector(".story-meta").innerHTML =
-      `<span class="story-source">${story.source}</span>${story.age ? ` · ${story.age}` : ""}<span class="editorial-badge">${story.type || "News"}</span>`;
+      `<span class="story-source">${story.source}</span>${story.age ? ` · ${story.age}` : ""}<span class="editorial-badge">${story.type || "News"}</span><button class="inline-save">${isSaved(story) ? "Saved" : "Save"}</button>`;
+    const saveBtn=node.querySelector(".inline-save");
+    saveBtn?.addEventListener("click",(e)=>{
+      e.preventDefault();e.stopPropagation();
+      const nowSaved=toggleSaved(story);
+      saveBtn.textContent=nowSaved ? "Saved" : "Save";
+      saveBtn.classList.toggle("saved",nowSaved);
+    });
     grid.appendChild(node);
   });
 }
@@ -279,7 +382,9 @@ document.querySelectorAll(".bottom-nav button").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".bottom-nav button").forEach(x => x.classList.remove("active"));
     btn.classList.add("active");
-    if (btn.dataset.view === "home") window.scrollTo({top:0, behavior:"smooth"});
+    if (btn.dataset.view === "home") { renderEdition(currentEdition,currentIsLive); window.scrollTo({top:0, behavior:"smooth"}); }
+    if (btn.dataset.view === "sections") renderSectionsView();
+    if (btn.dataset.view === "saved") renderSavedView();
   });
 });
 
