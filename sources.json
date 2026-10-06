@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "sources": [
     {
       "id": "popville",
@@ -53,9 +53,9 @@
       "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/espana/portada",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true,
+      "enabled": false,
       "min_interval_minutes": 30,
-      "notes": "Official EL PAÍS España section RSS."
+      "notes": "Official EL PAÍS España section RSS. Legacy general-front-page feed retained only for archive; disabled."
     },
     {
       "id": "reddit_greenbaypackers",
@@ -220,6 +220,18 @@
       "editorial_type": "official_team",
       "enabled": false,
       "notes": "Official athletics site. Add RSS adapter once exact feed endpoint is validated."
+    },
+    {
+      "id": "elpais_espana",
+      "name": "El País — España",
+      "beat": "spain",
+      "type": "rss",
+      "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/espana/portada",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Official EL PAÍS España section RSS."
     }
   ]
 }
