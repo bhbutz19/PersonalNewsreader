@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "sources": [
     {
       "id": "popville",
@@ -59,8 +59,8 @@
       "url": "https://www.reddit.com/r/GreenBayPackers/new/.rss",
       "priority": "conversation",
       "editorial_type": "social",
-      "enabled": false,
-      "notes": "Enable after validating rate behavior."
+      "enabled": true,
+      "notes": "Conversation source only; never authoritative for factual claims."
     },
     {
       "id": "reddit_brewers",
@@ -70,8 +70,8 @@
       "url": "https://www.reddit.com/r/Brewers/new/.rss",
       "priority": "conversation",
       "editorial_type": "social",
-      "enabled": false,
-      "notes": "Enable after validating rate behavior."
+      "enabled": true,
+      "notes": "Conversation source only; never authoritative for factual claims."
     },
     {
       "id": "motorsport_f1",
@@ -143,6 +143,67 @@
       "priority": "primary",
       "editorial_type": "reported_news",
       "enabled": true
+    },
+    {
+      "id": "dc_council_hearings_archive",
+      "name": "DC Council Video Hearings Archive",
+      "beat": "dc_politics",
+      "type": "rss",
+      "url": "https://dc.granicus.com/VPodcast.php?view_id=2",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": true
+    },
+    {
+      "id": "govinfo_presidential_documents",
+      "name": "GovInfo — Compilation of Presidential Documents",
+      "beat": "us_politics",
+      "type": "rss",
+      "url": "https://www.govinfo.gov/rss/dcpd.xml",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": true
+    },
+    {
+      "id": "govinfo_congressional_hearings",
+      "name": "GovInfo — Congressional Hearings",
+      "beat": "us_politics",
+      "type": "rss",
+      "url": "https://www.govinfo.gov/rss/chrg.xml",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": true
+    },
+    {
+      "id": "govinfo_congressional_record",
+      "name": "GovInfo — Congressional Record",
+      "beat": "us_politics",
+      "type": "rss",
+      "url": "https://www.govinfo.gov/rss/crec.xml",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": true
+    },
+    {
+      "id": "govinfo_federal_register",
+      "name": "GovInfo — Federal Register",
+      "beat": "us_politics",
+      "type": "rss",
+      "url": "https://www.govinfo.gov/rss/fr.xml",
+      "priority": "primary_source",
+      "editorial_type": "primary_source",
+      "enabled": true
+    },
+    {
+      "id": "uwm_panthers_web",
+      "name": "Milwaukee Panthers Athletics",
+      "beat": "uwm",
+      "type": "web_registry",
+      "url": "https://mkepanthers.com/",
+      "priority": "official",
+      "editorial_type": "official_team",
+      "enabled": false,
+      "notes": "Official athletics site. Add RSS adapter once exact feed endpoint is validated."
     }
   ]
 }
