@@ -60,6 +60,48 @@ def local_points(beat):
         return 7
     return 2
 
+def editorially_usable(source_id, beat, title, url):
+    t=(title or "").strip()
+    low=t.lower()
+    if not t:
+        return False
+
+    exact_junk={
+        "download the app","learn more about openweb","interview with politico",
+        "her fourth hot wing","100,000 protesters"
+    }
+    if low in exact_junk:
+        return False
+
+    fragment_prefixes=(
+        "according to ","per the ","per ","to learn more ","from ",
+        "overturned the ","wrote to ","federal documents show ",
+        "aquifer breach on ","died oct.","interview with "
+    )
+    if low.startswith(fragment_prefixes):
+        return False
+
+    if beat=="dc_dining":
+        if any(x in low for x in (
+            "best new restaurants in manhattan",
+            "best new restaurants in los angeles",
+            "portland, oregon",
+            "openweb"
+        )):
+            return False
+
+    if beat=="cooking" and any(x in low for x in ("openweb","portland, oregon")):
+        return False
+
+    # Guard against sentence fragments masquerading as headlines.
+    if len(t) < 18:
+        return False
+    first_alpha = next((ch for ch in t if ch.isalpha()), "")
+    if first_alpha and first_alpha.islower():
+        return False
+
+    return True
+
 def score_item(row, guide, now):
     (item_id, source_id, source_name, beat, editorial_type, title,
      published_at, fetched_at, metadata, priority) = row
@@ -133,7 +175,7 @@ def main():
                     AND COALESCE(i.metadata->>'extraction_version','1') <> '2'
                   )
             """)
-            rows = cur.fetchall()
+            rows = [r for r in cur.fetchall() if editorially_usable(r[1], r[3], r[5], None)]
 
         scored = 0
         with conn.cursor() as cur:
