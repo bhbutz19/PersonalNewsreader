@@ -62,6 +62,22 @@ def child_text_by_local(el, names):
             return ch.text.strip()
     return ""
 
+
+def image_url(entry):
+    # Prefer explicit RSS/Media RSS image elements already supplied by publishers.
+    for ch in entry.iter():
+        name = local_name(ch.tag).lower()
+        url = ch.attrib.get("url") or ch.attrib.get("href")
+        if not url:
+            continue
+        medium = (ch.attrib.get("medium") or "").lower()
+        ctype = (ch.attrib.get("type") or "").lower()
+        if name in ("thumbnail", "image"):
+            return url
+        if name in ("content", "enclosure") and (medium == "image" or ctype.startswith("image/")):
+            return url
+    return ""
+
 def atom_link(entry):
     for ch in list(entry):
         if local_name(ch.tag) == "link":
@@ -89,6 +105,7 @@ def parse_feed(data):
                 "author": strip_html(child_text_by_local(x, ["author", "creator"])),
                 "published_at": parse_date(child_text_by_local(x, ["pubDate", "date", "published", "updated"])),
                 "summary": strip_html(child_text_by_local(x, ["description", "summary", "encoded"])),
+                "image_url": image_url(x),
             })
     else:
         candidates = [x for x in root.iter() if local_name(x.tag).lower() == "entry"]
@@ -108,6 +125,7 @@ def parse_feed(data):
                 "author": strip_html(author),
                 "published_at": parse_date(child_text_by_local(x, ["published", "updated"])),
                 "summary": strip_html(child_text_by_local(x, ["summary", "content"])),
+                "image_url": image_url(x),
             })
     return out
 
@@ -221,15 +239,19 @@ def main():
                         cur.execute("""
                             INSERT INTO items (
                                 fingerprint, source_id, source_name, beat, editorial_type,
-                                title, url, author, published_at, fetched_at, summary, raw_id
+                                title, url, author, published_at, fetched_at, summary, raw_id, metadata
                             )
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                            ON CONFLICT (fingerprint) DO NOTHING
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb)
+                            ON CONFLICT (fingerprint) DO UPDATE SET
+                                url=EXCLUDED.url,
+                                summary=EXCLUDED.summary,
+                                metadata=EXCLUDED.metadata
                         """, (
                             fp, source["id"], source["name"], source["beat"],
                             source.get("editorial_type"), item["title"], item.get("url"),
                             item.get("author"), item.get("published_at"), checked,
-                            item.get("summary"), item.get("raw_id")
+                            item.get("summary"), item.get("raw_id"),
+                            json.dumps({"image_url": item.get("image_url") or ""})
                         ))
                         inserted += cur.rowcount
 
