@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "sources": [
     {
       "id": "popville",
@@ -50,11 +50,12 @@
       "name": "El País — España",
       "beat": "spain",
       "type": "rss",
-      "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+      "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/espana/portada",
       "priority": "primary",
       "editorial_type": "reported_news",
       "enabled": true,
-      "min_interval_minutes": 30
+      "min_interval_minutes": 30,
+      "notes": "Official EL PAÍS España section RSS."
     },
     {
       "id": "reddit_greenbaypackers",
