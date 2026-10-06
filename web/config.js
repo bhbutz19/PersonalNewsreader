@@ -1,4 +1,4 @@
 window.NEWSREADER_CONFIG = {
   supabaseUrl: "https://biwcsfuhhicfwglmytxh.supabase.co",
-  supabaseAnonKey: ""
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpd2NzZnVoaGljZndnbG15dHhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTMwNjcsImV4cCI6MjEwNjg2OTA2N30.rg8LgfuOOy2RDn7oSG5lHjTIzqi5belycRpZyGmFmnM"
 };
