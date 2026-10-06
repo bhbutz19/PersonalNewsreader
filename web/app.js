@@ -130,7 +130,8 @@ function toViewModel(record) {
       source: row.source || "",
       age: relativeAge(row.latest_seen || row.first_seen),
       type: titleCaseEditorialType(row.editorial_type),
-      url: row.url || ""
+      url: row.url || "",
+      image: row.image_url || ""
     });
     perSection.set(row.beat, count + 1);
     if (stories.length >= 18) break;
@@ -145,22 +146,23 @@ function toViewModel(record) {
       source: lead.source || "",
       age: relativeAge(lead.latest_seen || lead.first_seen),
       type: titleCaseEditorialType(lead.editorial_type),
-      url: lead.url || ""
+      url: lead.url || "",
+      image: lead.image_url || ""
     },
     briefing: brief,
     stories
   };
 }
 
-async function fetchLiveEdition() {
+async function fetchLiveEditions() {
   const cfg = window.NEWSREADER_CONFIG || {};
-  if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) return null;
+  if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) return {};
 
   const url = new URL("/rest/v1/editions", cfg.supabaseUrl);
   url.searchParams.set("select", "edition_type,edition_date,generated_at,payload");
-  url.searchParams.set("edition_type", "eq.morning");
+  url.searchParams.set("edition_type", "in.(morning,evening)");
   url.searchParams.set("order", "edition_date.desc,generated_at.desc");
-  url.searchParams.set("limit", "1");
+  url.searchParams.set("limit", "4");
 
   const response = await fetch(url.toString(), {
     headers: {
@@ -171,7 +173,11 @@ async function fetchLiveEdition() {
   });
   if (!response.ok) throw new Error(`Supabase returned ${response.status}`);
   const rows = await response.json();
-  return rows[0] ? toViewModel(rows[0]) : null;
+  const out = {};
+  for (const row of rows) {
+    if (!out[row.edition_type]) out[row.edition_type] = toViewModel(row);
+  }
+  return out;
 }
 
 function renderNav() {
@@ -289,11 +295,15 @@ function renderSectionsView() {
 
 let currentEdition = demoEdition;
 let currentIsLive = false;
+let liveEditions = {};
+let currentEditionType = "morning";
 
 function renderEdition(edition, live) {
   currentEdition = edition;
   currentIsLive = live;
   document.getElementById("issueDate").textContent = edition.date;
+  const pill = document.querySelector(".edition-pill");
+  if (pill) pill.textContent = currentEditionType === "evening" ? "EVENING EDITION" : "MORNING EDITION";
   const status = document.getElementById("liveStatus");
   status.textContent = live ? "LIVE EDITION" : "DEMO EDITION";
   status.dataset.state = live ? "live" : "demo";
@@ -312,7 +322,7 @@ function renderEdition(edition, live) {
         <button id="leadSave" class="inline-save">${isSaved(edition.lead) ? "Saved" : "Save"}</button>
       </div>
     </div>
-    ${live ? "" : `<div class="lead-art" role="img" aria-label="Editorial illustration"><div class="art-caption">Morning Edition · ${edition.lead.section}</div></div>`}
+    ${edition.lead.image ? `<figure class="lead-image"><img src="${edition.lead.image}" alt="" loading="eager" referrerpolicy="no-referrer"><figcaption>${edition.lead.source}</figcaption></figure>` : (live ? "" : `<div class="lead-art" role="img" aria-label="Editorial illustration"><div class="art-caption">Morning Edition · ${edition.lead.section}</div></div>`)}
   `;
 
   document.getElementById("briefing").innerHTML = `
@@ -340,6 +350,15 @@ function renderEdition(edition, live) {
     card.dataset.section = story.section;
     card.dataset.link = story.url ? "true" : "false";
     node.querySelector(".story-kicker").textContent = story.section;
+    if (story.image) {
+      const img = document.createElement("img");
+      img.className = "story-image";
+      img.src = story.image;
+      img.alt = "";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      card.insertBefore(img, node.querySelector("h3"));
+    }
     const h3 = node.querySelector("h3");
     if (story.url) {
       const a = document.createElement("a");
@@ -367,12 +386,30 @@ function renderEdition(edition, live) {
   });
 }
 
+
+function switchEdition() {
+  const target = currentEditionType === "morning" ? "evening" : "morning";
+  if (!liveEditions[target]) return;
+  currentEditionType = target;
+  renderEdition(liveEditions[target], true);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
 async function boot() {
   renderNav();
   renderEdition(demoEdition, false);
   try {
-    const live = await fetchLiveEdition();
+    liveEditions = await fetchLiveEditions();
+    const hour = new Date().getHours();
+    currentEditionType = (hour >= 17 && liveEditions.evening) ? "evening" : "morning";
+    const live = liveEditions[currentEditionType] || liveEditions.morning || liveEditions.evening;
     if (live) renderEdition(live, true);
+    const pill=document.querySelector(".edition-pill");
+    if (pill && liveEditions.morning && liveEditions.evening) {
+      pill.classList.add("switchable");
+      pill.title="Tap to switch editions";
+      pill.addEventListener("click", switchEdition);
+    }
   } catch (err) {
     console.error("Live edition unavailable; using demo.", err);
   }
