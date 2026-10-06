@@ -68,13 +68,14 @@ def editorially_usable(source_id, beat, title, url):
 
     exact_junk={
         "download the app","learn more about openweb","interview with politico",
-        "her fourth hot wing","100,000 protesters"
+        "her fourth hot wing","100,000 protesters","pic, via katy lunsford"
     }
     if low in exact_junk:
         return False
 
     fragment_prefixes=(
         "according to ","per the ","per ","to learn more ","from ",
+        "read more from ","pic, via ","photo, via ",
         "overturned the ","wrote to ","federal documents show ",
         "aquifer breach on ","died oct.","interview with "
     )
@@ -90,7 +91,10 @@ def editorially_usable(source_id, beat, title, url):
         )):
             return False
 
-    if beat=="cooking" and any(x in low for x in ("openweb","portland, oregon")):
+    if beat=="cooking":
+        return False
+
+    if source_id=="elpais_spain":
         return False
 
     # Guard against sentence fragments masquerading as headlines.
