@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -20,7 +20,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 12,
-      "title_reject_regex": "(?i)^(read more from|according to|to learn more|from |listen to|support for|photo:|credit:)"
+      "title_reject_regex": "(?i)^(read more from|according to|to learn more|from |listen to|support for|photo:|credit:|manage your preferences)"
     },
     {
       "name": "Wisconsin Watch Forward",
@@ -31,7 +31,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 12,
-      "title_reject_regex": "(?i)^(read more from|according to|to learn more|from |photo:|credit:)"
+      "title_reject_regex": "(?i)^(read more from|according to|to learn more|from |photo:|credit:|manage your preferences|russian hackers sent|hackers tried|fbi identified)"
     },
     {
       "name": "Menorca Es Diari",
@@ -63,7 +63,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 15,
-      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)"
+      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)|(^the sun.?s .+ reports$)"
     },
     {
       "name": "Politico",
