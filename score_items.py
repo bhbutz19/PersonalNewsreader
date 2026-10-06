@@ -68,14 +68,17 @@ def editorially_usable(source_id, beat, title, url):
 
     exact_junk={
         "download the app","learn more about openweb","interview with politico",
-        "her fourth hot wing","100,000 protesters","pic, via katy lunsford"
+        "her fourth hot wing","100,000 protesters","pic, via katy lunsford",
+        "manage your preferences here","the sun’s adora brown reports",
+        "the sun's adora brown reports"
     }
     if low in exact_junk:
         return False
 
     fragment_prefixes=(
         "according to ","per the ","per ","to learn more ","from ",
-        "read more from ","pic, via ","photo, via ",
+        "read more from ","pic, via ","photo, via ","manage your preferences",
+        "russian hackers sent ","hackers tried ","fbi identified ",
         "overturned the ","wrote to ","federal documents show ",
         "aquifer breach on ","died oct.","interview with "
     )
