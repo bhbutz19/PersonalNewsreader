@@ -1,53 +1,106 @@
 {
-  "version": 1,
+  "version": 2,
   "rules": [
     {
       "name": "Urban Milwaukee",
+      "source_id": "email_urban_milwaukee",
+      "homepage": "https://urbanmilwaukee.com/",
       "subject_regex": "^Urban Milwaukee",
       "beat": "milwaukee",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "WPR Wisconsin Today",
+      "source_id": "email_wpr_wisconsin_today",
+      "homepage": "https://www.wpr.org/news",
       "subject_regex": "^Wisconsin Today:",
       "beat": "wisconsin",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "Wisconsin Watch Forward",
+      "source_id": "email_wisconsin_watch",
+      "homepage": "https://wisconsinwatch.org/",
       "subject_regex": "^(Forward:|The Act 10 saga)",
       "beat": "wisconsin_politics",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "Menorca Es Diari",
+      "source_id": "email_menorca_esdiari",
+      "homepage": "https://www.menorca.info/",
       "subject_regex": "^Las claves de Es Diari$",
       "beat": "menorca",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "Eater DC",
+      "source_id": "email_eater_dc",
+      "homepage": "https://dc.eater.com/",
       "subject_regex": "(Eater DC|D\\.C\\.|new openings|best dishes)",
       "beat": "dc_dining",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "Washington Sun",
+      "source_id": "email_washington_sun",
+      "homepage": "https://www.washingtonsun.com/",
       "subject_regex": "(What They’re Talking About|Campaign .*DC|PAC Off|Final Countdown)",
       "beat": "us_politics",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "Politico",
+      "source_id": "email_politico",
+      "homepage": "https://www.politico.com/",
       "subject_regex": "(SCOTUS|Obama returns|Buttigieg|DOJ subpoenas)",
       "beat": "us_politics",
-      "editorial_type": "reported_news"
+      "editorial_type": "reported_news",
+      "extract_articles": true
     },
     {
       "name": "Cooking",
+      "source_id": "email_cooking",
+      "homepage": "https://mail.google.com/",
       "subject_regex": "(recipes|favorite foods|Eater editors)",
       "beat": "cooking",
-      "editorial_type": "newsletter"
+      "editorial_type": "newsletter",
+      "extract_articles": true
     }
-  ]
+  ],
+  "link_filters": {
+    "reject_text": [
+      "unsubscribe",
+      "manage preferences",
+      "view in browser",
+      "browser view",
+      "subscribe",
+      "sign up",
+      "instagram",
+      "facebook",
+      "twitter",
+      "x.com",
+      "privacy",
+      "contact us",
+      "donate",
+      "advertise",
+      "newsletter"
+    ],
+    "reject_domains": [
+      "google.com",
+      "gmail.com",
+      "facebook.com",
+      "instagram.com",
+      "twitter.com",
+      "x.com",
+      "linkedin.com"
+    ],
+    "min_title_length": 8
+  }
 }
