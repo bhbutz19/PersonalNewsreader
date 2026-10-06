@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f0e6" />
+  <title>Morning Paper</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="masthead">
+      <div class="issue-row">
+        <span id="issueDate">MONDAY, OCT 6, 2026</span>
+        <span class="edition-pill">MORNING EDITION</span>
+      </div>
+      <h1>Morning Paper</h1>
+      <div class="tagline">NEWS FOR A BRIGHTER, MORE CURIOUS DAY</div>
+      <nav id="sectionNav" class="section-nav" aria-label="Sections"></nav>
+    </header>
+
+    <main id="paper">
+      <section id="lead" class="lead-story"></section>
+      <section id="briefing" class="briefing"></section>
+      <section id="sectionGrid" class="section-grid"></section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Primary">
+      <button class="active" data-view="home" aria-label="Home"><span>⌂</span><small>Home</small></button>
+      <button data-view="sections" aria-label="Sections"><span>▦</span><small>Sections</small></button>
+      <button data-view="saved" aria-label="Saved"><span>♡</span><small>Saved</small></button>
+      <button data-view="search" aria-label="Search"><span>⌕</span><small>Search</small></button>
+    </nav>
+  </div>
+
+  <template id="storyCardTemplate">
+    <article class="story-card">
+      <div class="story-kicker"></div>
+      <h3></h3>
+      <p class="story-deck"></p>
+      <div class="story-meta"></div>
+    </article>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
