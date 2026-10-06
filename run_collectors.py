@@ -11,4 +11,5 @@ def run_stage(name, command):
 
 run_stage("RSS_WEB", [sys.executable, "-u", "ingest.py"])
 run_stage("GMAIL", [sys.executable, "-u", "email_ingest.py"])
+run_stage("SCORE", [sys.executable, "-u", "score_items.py"])
 print("=== ALL COLLECTORS COMPLETE ===", flush=True)
