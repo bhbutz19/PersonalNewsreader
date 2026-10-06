@@ -166,7 +166,7 @@ def main():
         if s.get("enabled", True) and s.get("type") == "rss"
     ]
 
-    with psycopg.connect(DATABASE_URL, autocommit=False) as conn:
+    with psycopg.connect(DATABASE_URL, autocommit=False, prepare_threshold=None) as conn:
         init_db(conn)
         sync_sources(conn, config)
 
