@@ -48,7 +48,7 @@ a{color:inherit;text-decoration:none}
   justify-content:space-between;
   align-items:center;
   gap:12px;
-  padding:8px 0 0;
+  padding:5px 0 0;
   font-family:Arial,sans-serif;
   font-size:10px;
   letter-spacing:.19em;
@@ -64,7 +64,7 @@ a{color:inherit;text-decoration:none}
 
 .masthead h1{
   text-align:center;
-  margin:8px 0 3px;
+  margin:5px 0 2px;
   font-size:clamp(44px,10.5vw,64px);
   line-height:.9;
   letter-spacing:-.055em;
@@ -73,7 +73,7 @@ a{color:inherit;text-decoration:none}
 
 .tagline{
   border-top:1px solid var(--rule);
-  padding:6px 0 7px;
+  padding:5px 0 5px;
   text-align:center;
   font-family:Arial,sans-serif;
   font-size:9px;
@@ -86,7 +86,7 @@ a{color:inherit;text-decoration:none}
   gap:22px;
   overflow-x:auto;
   scrollbar-width:none;
-  padding:7px 0 7px;
+  padding:6px 0 5px;
   white-space:nowrap;
   font-size:14px;
   font-weight:700;
@@ -95,15 +95,15 @@ a{color:inherit;text-decoration:none}
 .section-nav button{
   border:0;
   background:none;
-  padding:0 0 5px;
+  padding:0 0 4px;
   color:var(--ink);
 }
 .section-nav button.active{
-  border-bottom:3px solid var(--olive);
+  border-bottom:2px solid var(--olive);
   color:var(--olive-dark);
 }
 
-#paper{padding-top:14px}
+#paper{padding-top:10px}
 
 .kicker{
   font-family:Arial,sans-serif;
@@ -195,7 +195,7 @@ a{color:inherit;text-decoration:none}
   margin:3px 0 4px;
   font-size:24px;
 }
-.briefing p{margin:0;color:#464840;line-height:1.35}
+.briefing p{margin:0;color:#5b5b52;line-height:1.32;font-size:14px}
 .briefing-list{
   display:grid;
   gap:5px;
@@ -240,7 +240,7 @@ a{color:inherit;text-decoration:none}
   letter-spacing:.16em;
   text-transform:uppercase;
   color:var(--olive-dark);
-  margin-bottom:6px;
+  margin-bottom:7px;
 }
 .story-card h3{
   font-size:21px;
@@ -294,14 +294,14 @@ a{color:inherit;text-decoration:none}
 @media (max-width:500px){
   .app-shell{padding-left:13px;padding-right:13px}
   .issue-row{font-size:9px;letter-spacing:.16em}
-  .masthead h1{font-size:52px;line-height:.86;margin:7px 0 4px}
+  .masthead h1{font-size:48px;line-height:.86;margin:4px 0 3px}
   .tagline{font-size:8px;letter-spacing:.2em}
   .section-nav{font-size:13px;gap:18px}
   #paper{padding-top:10px}
   .lead-story{grid-template-columns:1fr;gap:10px;padding-top:6px}
-  .lead-copy h2{font-size:36px;line-height:.94;margin:5px 0 8px}
-  .lead-copy .deck{font-size:16px}
-  .lead-art{min-height:150px;order:2}
+  .lead-copy h2{font-size:34px;line-height:.95;margin:5px 0 7px}
+  .lead-copy .deck{font-size:15px;line-height:1.25}
+  .lead-art{min-height:125px;order:2}
   .section-grid{grid-template-columns:1fr 1fr}
   .story-card{min-height:176px}
   .story-card h3{font-size:19px}
@@ -315,11 +315,6 @@ a{color:inherit;text-decoration:none}
   }
 }
 
-
-  html{background:#0e0f0b}
-  .lead-art::before,.lead-art::after{background:#d6d1c4}
-  .briefing p,.story-deck{color:#d0cdc3}
-}
 
 .editorial-badge{
   display:inline-block;
@@ -338,3 +333,17 @@ a{color:inherit;text-decoration:none}
   font-weight:700;
   color:#4f5049;
 }
+
+.live-status{
+  margin:2px 0 0;
+  text-align:center;
+  font-family:Arial,sans-serif;
+  font-size:8px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#77786f;
+}
+.live-status[data-state="live"]{color:#5e6346}
+.story-card a,.lead-copy a{display:block}
+.story-card[data-link="true"]{cursor:pointer}
+.story-card[data-link="true"]:active{opacity:.68}
