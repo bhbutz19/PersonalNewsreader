@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -20,7 +20,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 12,
-      "title_reject_regex": "(?i)^(according to|to learn more|from |read more|listen to|support for|photo:|credit:)"
+      "title_reject_regex": "(?i)^(read more from|according to|to learn more|from |listen to|support for|photo:|credit:)"
     },
     {
       "name": "Wisconsin Watch Forward",
@@ -31,7 +31,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 12,
-      "title_reject_regex": "(?i)^(according to|to learn more|from |read more|listen to|support for|photo:|credit:)"
+      "title_reject_regex": "(?i)^(read more from|according to|to learn more|from |photo:|credit:)"
     },
     {
       "name": "Menorca Es Diari",
@@ -63,7 +63,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 15,
-      "title_reject_regex": "(?i)^(download the app|listen now|read more|view online|manage |follow |sign up)"
+      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)"
     },
     {
       "name": "Politico",
@@ -74,7 +74,7 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 18,
-      "title_reject_regex": "(?i)^(download the app|listen now|read more|view online|manage |follow |sign up)"
+      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)"
     },
     {
       "name": "Cooking",
@@ -83,9 +83,10 @@
       "subject_regex": "(recipes|favorite foods|Eater editors)",
       "beat": "cooking",
       "editorial_type": "newsletter",
-      "extract_articles": true,
+      "extract_articles": false,
       "max_article_links": 10,
-      "title_reject_regex": "(?i)(OpenWeb|Download the app|all the new openings in Portland)"
+      "title_reject_regex": "(?i)(OpenWeb|Download the app|all the new openings in Portland)",
+      "notes": "Temporarily disabled: generic Eater/cooking newsletters are producing restaurant-industry/navigation noise. Replace with dedicated cooking sources."
     }
   ],
   "link_filters": {
