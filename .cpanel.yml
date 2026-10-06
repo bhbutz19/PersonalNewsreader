@@ -1,6 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/cowboybu/public_html/news/
-    - /bin/mkdir -p $DEPLOYPATH
-    - /bin/cp -R web/. $DEPLOYPATH
+    - /bin/mkdir -p /home/cowboybu/public_html/news
+    - /bin/cp -R web/. /home/cowboybu/public_html/news/
