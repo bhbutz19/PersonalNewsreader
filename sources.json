@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "sources": [
     {
       "id": "popville",
@@ -75,14 +75,13 @@
     },
     {
       "id": "motorsport_f1",
-      "name": "Motorsport.com Formula 1",
+      "name": "Motorsport.com Formula 1 News",
       "beat": "f1",
-      "type": "web_registry",
-      "url": "https://www.motorsport.com/rss/",
+      "type": "rss",
+      "url": "https://www.motorsport.com/rss/f1/news/",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": false,
-      "notes": "Exact Formula 1 feed endpoint to validate before enabling."
+      "enabled": true
     },
     {
       "id": "govinfo",
@@ -124,6 +123,26 @@
       "priority": "primary",
       "editorial_type": "reported_news",
       "enabled": false
+    },
+    {
+      "id": "brewers_news",
+      "name": "Milwaukee Brewers News",
+      "beat": "brewers",
+      "type": "rss",
+      "url": "https://www.mlb.com/brewers/feeds/news/rss.xml",
+      "priority": "official",
+      "editorial_type": "official_team",
+      "enabled": true
+    },
+    {
+      "id": "eater_dc",
+      "name": "Eater DC",
+      "beat": "dc_dining",
+      "type": "rss",
+      "url": "https://dc.eater.com/rss/index.xml",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true
     }
   ]
 }
