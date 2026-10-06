@@ -233,6 +233,18 @@ def headline_like(title):
         return False
     return True
 
+def source_title_allowed(rule, title):
+    if not rule:
+        return True
+    pattern = rule.get("title_reject_regex")
+    if pattern and re.search(pattern, title or "", re.I):
+        return False
+    # Newsletter story anchors should normally read like headlines, not sentence fragments.
+    m = re.search(r"[A-Za-zÀ-ÿ]", title or "")
+    if m and (title or "")[m.start()].islower():
+        return False
+    return True
+
 def item_fingerprint(source_id, title, url):
     # Newsletter tracking URLs change from send to send.  A stable source +
     # normalized headline fingerprint prevents the same story from becoming
@@ -357,6 +369,8 @@ def main():
                     for title, href in links:
                         if title.lower() == subject.lower():
                             continue
+                        if not source_title_allowed(rule, title):
+                            continue
                         item_fp = item_fingerprint(source_id, title, href)
                         item_meta = {
                             "channel": "email",
@@ -365,7 +379,7 @@ def main():
                             "newsletter_subject": subject,
                             "forwarded": is_forwarded,
                             "original_sender": original_sender,
-                            "extraction_version": 2,
+                            "extraction_version": 3,
                         }
                         with conn.cursor() as cur:
                             cur.execute("""
@@ -374,7 +388,12 @@ def main():
                                     title,url,author,published_at,fetched_at,summary,raw_id,metadata
                                 )
                                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),%s,%s,%s::jsonb)
-                                ON CONFLICT (fingerprint) DO NOTHING
+                                ON CONFLICT (fingerprint) DO UPDATE SET
+                                    url=EXCLUDED.url,
+                                    author=EXCLUDED.author,
+                                    published_at=EXCLUDED.published_at,
+                                    fetched_at=NOW(),
+                                    metadata=EXCLUDED.metadata
                             """, (item_fp,source_id,rule["name"],beat,editorial_type,title,href,
                                   sender_name or sender,received,"",message_id,json.dumps(item_meta)))
                             inserted_articles += cur.rowcount
