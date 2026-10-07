@@ -301,16 +301,10 @@ def main():
     config = json.loads(RULES_PATH.read_text(encoding="utf-8"))
     rules = config.get("rules", [])
     filters = config.get("link_filters", {})
-    cutoff = (now_utc() - dt.timedelta(days=GMAIL_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
-
     mail = imaplib.IMAP4_SSL("imap.gmail.com")
     try:
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         mail.select("INBOX", readonly=True)
-        status, data = mail.uid("search", None, f'(SINCE "{cutoff}")')
-        if status != "OK":
-            raise RuntimeError("Gmail IMAP search failed")
-        uids = data[0].split()
 
         parsed = inserted_messages = inserted_articles = 0
 
@@ -318,7 +312,131 @@ def main():
             ensure_tables(conn)
             sync_email_sources(conn, rules)
 
-            for uidb in uids[-500:]:
+            # Normal operation is incremental: Gmail UIDs are monotonically
+            # increasing within a mailbox, so only fetch messages newer than
+            # the highest UID we have already persisted. The date lookback is
+            # used only for the very first bootstrap/recovery run.
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT MAX(gmail_uid::bigint)
+                    FROM email_messages
+                    WHERE gmail_uid ~ '^[0-9]+
+                uid = uidb.decode()
+                status, fetched = mail.uid("fetch", uid, "(BODY.PEEK[])")
+                if status != "OK" or not fetched:
+                    continue
+                raw = next((part[1] for part in fetched if isinstance(part, tuple) and len(part) > 1), None)
+                if not raw:
+                    continue
+
+                msg = email.message_from_bytes(raw)
+                subject = decode_mime(msg.get("Subject", "")).strip() or "(no subject)"
+                sender_name, sender_addr = parseaddr(decode_mime(msg.get("From", "")))
+                sender = sender_addr or decode_mime(msg.get("From", ""))
+                received = parse_received(msg.get("Date"))
+                message_id = (msg.get("Message-ID") or "").strip()
+                text = body_text(msg)
+                is_forwarded, original_sender = detect_forwarded(text, subject)
+                rule = classify(subject, sender, rules)
+
+                beat = rule.get("beat") if rule else "unclassified_email"
+                editorial_type = rule.get("editorial_type") if rule else "newsletter"
+                rule_name = rule.get("name") if rule else None
+                fp = message_fingerprint(message_id, uid, sender, subject, received)
+
+                metadata = {
+                    "rule_name": rule_name,
+                    "to": decode_mime(msg.get("To", "")),
+                    "reply_to": decode_mime(msg.get("Reply-To", "")),
+                }
+
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO email_messages (
+                            fingerprint,gmail_uid,message_id,sender,sender_name,subject,
+                            received_at,fetched_at,beat,editorial_type,body_text,
+                            original_sender,is_forwarded,metadata
+                        )
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,NOW(),%s,%s,%s,%s,%s,%s::jsonb)
+                        ON CONFLICT (fingerprint) DO NOTHING
+                    """, (fp,uid,message_id,sender,sender_name,subject,received,beat,
+                          editorial_type,text,original_sender,is_forwarded,json.dumps(metadata)))
+                    inserted_messages += cur.rowcount
+
+                if rule and rule.get("extract_articles"):
+                    source_id = rule["source_id"]
+                    links = extract_links(msg, filters)
+                    max_links = int(rule.get("max_article_links", 30))
+                    links = links[:max_links]
+                    print(f"EMAIL {rule['name']}: {subject!r} -> {len(links)} headline candidates", flush=True)
+                    for title, href in links:
+                        if title.lower() == subject.lower():
+                            continue
+                        if not source_title_allowed(rule, title):
+                            continue
+                        item_fp = item_fingerprint(source_id, title, href)
+                        item_meta = {
+                            "channel": "email",
+                            "email_message_id": message_id,
+                            "gmail_uid": uid,
+                            "newsletter_subject": subject,
+                            "forwarded": is_forwarded,
+                            "original_sender": original_sender,
+                            "extraction_version": 3,
+                            "must_carry": bool(rule.get("must_carry")),
+                        }
+                        with conn.cursor() as cur:
+                            cur.execute("""
+                                INSERT INTO items (
+                                    fingerprint,source_id,source_name,beat,editorial_type,
+                                    title,url,author,published_at,fetched_at,summary,raw_id,metadata
+                                )
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),%s,%s,%s::jsonb)
+                                ON CONFLICT (fingerprint) DO UPDATE SET
+                                    url=EXCLUDED.url,
+                                    author=EXCLUDED.author,
+                                    published_at=EXCLUDED.published_at,
+                                    fetched_at=NOW(),
+                                    metadata=EXCLUDED.metadata
+                            """, (item_fp,source_id,rule["name"],beat,editorial_type,title,href,
+                                  sender_name or sender,received,"",message_id,json.dumps(item_meta)))
+                            inserted_articles += cur.rowcount
+
+                parsed += 1
+
+            conn.commit()
+
+        print(f"OK gmail: {parsed} inspected, {inserted_messages} new messages, {inserted_articles} article candidates")
+
+    finally:
+        try:
+            mail.logout()
+        except Exception:
+            pass
+
+if __name__ == "__main__":
+    main()
+
+                """)
+                row = cur.fetchone()
+                last_uid = int(row[0]) if row and row[0] is not None else None
+
+            if last_uid is not None:
+                start_uid = last_uid + 1
+                status, data = mail.uid("search", None, f"(UID {start_uid}:*)")
+                mode = f"incremental UID>{last_uid}"
+            else:
+                cutoff = (now_utc() - dt.timedelta(days=GMAIL_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
+                status, data = mail.uid("search", None, f'(SINCE "{cutoff}")')
+                mode = f"bootstrap last {GMAIL_LOOKBACK_DAYS} days"
+
+            if status != "OK":
+                raise RuntimeError("Gmail IMAP search failed")
+
+            uids = data[0].split() if data and data[0] else []
+            print(f"GMAIL {mode}: {len(uids)} message(s) to inspect", flush=True)
+
+            for uidb in uids:
                 uid = uidb.decode()
                 status, fetched = mail.uid("fetch", uid, "(BODY.PEEK[])")
                 if status != "OK" or not fetched:
