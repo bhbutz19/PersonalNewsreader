@@ -5,6 +5,7 @@ import hashlib
 import os
 import re
 import urllib.request
+from urllib.error import HTTPError
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -66,7 +67,13 @@ def parse(html):
     return out
 
 def main():
-    stories=parse(fetch())
+    try:
+        stories=parse(fetch())
+    except HTTPError as exc:
+        if exc.code == 403:
+            print("WASHINGTONIAN skipped: site blocks automated HTTP requests; use email ingestion", flush=True)
+            return
+        raise
     inserted=0
 
     with psycopg.connect(DATABASE_URL,autocommit=False,prepare_threshold=None) as conn:
