@@ -338,6 +338,8 @@ def main():
                 raise RuntimeError("Gmail IMAP search failed")
 
             uids = data[0].split() if data and data[0] else []
+            if last_uid is not None:
+                uids = [u for u in uids if u.isdigit() and int(u) > last_uid]
             print(f"GMAIL {mode}: {len(uids)} message(s) to inspect", flush=True)
 
             for uidb in uids:
