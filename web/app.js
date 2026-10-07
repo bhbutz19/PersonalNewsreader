@@ -304,6 +304,8 @@ function renderEdition(edition, live) {
   document.getElementById("issueDate").textContent = edition.date;
   const pill = document.querySelector(".edition-pill");
   if (pill) pill.textContent = currentEditionType === "evening" ? "EVENING EDITION" : "MORNING EDITION";
+  const masthead = document.querySelector(".masthead h1");
+  if (masthead) masthead.textContent = currentEditionType === "evening" ? "Evening Paper" : "Morning Paper";
   const status = document.getElementById("liveStatus");
   status.textContent = live ? "LIVE EDITION" : "DEMO EDITION";
   status.dataset.state = live ? "live" : "demo";
@@ -327,8 +329,10 @@ function renderEdition(edition, live) {
 
   document.getElementById("briefing").innerHTML = `
     <div class="kicker">BRIEFING</div>
-    <h2>Your Morning Brief</h2>
-    <p>The three stories most worth knowing before you get into the rest of the paper.</p>
+    <h2>Your ${currentEditionType === "evening" ? "Evening" : "Morning"} Brief</h2>
+    <p>${currentEditionType === "evening"
+      ? "What materially changed since the morning paper — plus what is worth reading tonight."
+      : "The three stories most worth knowing before you get into the rest of the paper."}</p>
     <div class="briefing-list">${edition.briefing.map(x => `<div>${x}</div>`).join("")}</div>
   `;
 
