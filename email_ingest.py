@@ -291,6 +291,21 @@ def sync_email_sources(conn, rules):
             """, (source_id, rule["name"], rule["beat"], rule.get("homepage","https://mail.google.com/"),
                   "preferred" if rule.get("must_carry") else "primary",
                   rule.get("editorial_type","newsletter")))
+            # Keep previously extracted newsletter stories aligned with intentional
+            # source-rule changes (for example moving Washington Sun into dc_local).
+            cur.execute("""
+                UPDATE items
+                SET beat=%s,
+                    editorial_type=%s
+                WHERE source_id=%s
+                  AND (beat IS DISTINCT FROM %s OR editorial_type IS DISTINCT FROM %s)
+            """, (
+                rule["beat"],
+                rule.get("editorial_type","newsletter"),
+                source_id,
+                rule["beat"],
+                rule.get("editorial_type","newsletter")
+            ))
     conn.commit()
 
 def main():
