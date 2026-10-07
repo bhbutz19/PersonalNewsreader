@@ -106,51 +106,51 @@ function toViewModel(record) {
   const rows = flattenPayload(payload);
   if (!rows.length) return null;
 
+  const asStory = row => ({
+    beat: row.beat,
+    section: row.section,
+    title: row.title,
+    deck: row.summary || "",
+    source: row.source || "",
+    age: relativeAge(row.latest_seen || row.first_seen),
+    type: titleCaseEditorialType(row.editorial_type),
+    url: row.url || "",
+    image: row.image_url || "",
+    score: row.score || 0
+  });
+
+  // Preserve every story in the edition for section pages.
+  const allStories = rows.map(asStory);
+
   // Prefer Washington/local for the lead; otherwise take the highest-ranked story.
-  const lead = rows.find(x => x.beat === "dc_local")
+  const leadRow = rows.find(x => x.beat === "dc_local")
     || [...rows].sort((a,b) => (b.score || 0) - (a.score || 0))[0];
 
-  const remaining = rows.filter(x => x !== lead);
+  const remaining = rows.filter(x => x !== leadRow);
 
   const brief = [...remaining]
     .sort((a,b) => (b.score || 0) - (a.score || 0))
     .slice(0, 3)
     .map(x => x.summary || x.title);
 
+  // Front page remains deliberately selective: max two stories per beat.
   const stories = [];
   const perSection = new Map();
 
   for (const row of remaining) {
     const count = perSection.get(row.beat) || 0;
     if (count >= 2) continue;
-    stories.push({
-      section: row.section,
-      title: row.title,
-      deck: row.summary || "",
-      source: row.source || "",
-      age: relativeAge(row.latest_seen || row.first_seen),
-      type: titleCaseEditorialType(row.editorial_type),
-      url: row.url || "",
-      image: row.image_url || ""
-    });
+    stories.push(asStory(row));
     perSection.set(row.beat, count + 1);
     if (stories.length >= 18) break;
   }
 
   return {
     date: formatIssueDate(record.edition_date || payload.edition_date),
-    lead: {
-      section: lead.section,
-      title: lead.title,
-      deck: lead.summary || "",
-      source: lead.source || "",
-      age: relativeAge(lead.latest_seen || lead.first_seen),
-      type: titleCaseEditorialType(lead.editorial_type),
-      url: lead.url || "",
-      image: lead.image_url || ""
-    },
+    lead: asStory(leadRow),
     briefing: brief,
-    stories
+    stories,
+    allStories
   };
 }
 
@@ -191,12 +191,12 @@ function renderNav() {
       sectionNav.querySelectorAll("button").forEach(x => x.classList.remove("active"));
       b.classList.add("active");
       if (!sectionName) {
+        renderEdition(currentEdition, currentIsLive);
         window.scrollTo({top:0, behavior:"smooth"});
         return;
       }
-      const el = [...document.querySelectorAll(".story-card")]
-        .find(card => card.dataset.section === sectionName);
-      el?.scrollIntoView({behavior:"smooth", block:"start"});
+      renderSectionView(sectionName);
+      window.scrollTo({top:0, behavior:"smooth"});
     };
     sectionNav.appendChild(b);
   });
@@ -238,6 +238,100 @@ function toggleSaved(story) {
   return !exists;
 }
 
+function editionStories(edition=currentEdition) {
+  if (edition?.allStories?.length) return edition.allStories;
+  const rows = [...(edition?.stories || [])];
+  if (edition?.lead && !rows.some(x => savedKey(x) === savedKey(edition.lead))) rows.unshift(edition.lead);
+  return rows;
+}
+
+function appendStoryCard(grid, story, {showSection=true} = {}) {
+  const tpl = document.getElementById("storyCardTemplate");
+  const node = tpl.content.cloneNode(true);
+  const card = node.querySelector(".story-card");
+  card.dataset.section = story.section || "";
+  card.dataset.link = story.url ? "true" : "false";
+
+  const kicker=node.querySelector(".story-kicker");
+  kicker.textContent = showSection ? (story.section || "") : (story.type || "Story");
+
+  if (story.image) {
+    const img = document.createElement("img");
+    img.className = "story-image";
+    img.src = story.image;
+    img.alt = "";
+    img.loading = "lazy";
+    img.referrerPolicy = "no-referrer";
+    card.insertBefore(img, node.querySelector("h3"));
+  }
+
+  const h3=node.querySelector("h3");
+  if(story.url){
+    const a=document.createElement("a");
+    a.href=story.url;
+    a.target="_blank";
+    a.rel="noopener noreferrer";
+    a.textContent=story.title;
+    h3.appendChild(a);
+  } else {
+    h3.textContent=story.title;
+  }
+
+  const deck=node.querySelector(".story-deck");
+  deck.textContent=story.deck || "";
+  if(!story.deck) deck.style.display="none";
+
+  node.querySelector(".story-meta").innerHTML =
+    `<span class="story-source">${story.source || ""}</span>${story.age ? ` · ${story.age}` : ""}<span class="editorial-badge">${story.type || "News"}</span><button class="inline-save">${isSaved(story) ? "Saved" : "Save"}</button>`;
+
+  const saveBtn=node.querySelector(".inline-save");
+  saveBtn?.classList.toggle("saved", isSaved(story));
+  saveBtn?.addEventListener("click",(e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const nowSaved=toggleSaved(story);
+    saveBtn.textContent=nowSaved ? "Saved" : "Save";
+    saveBtn.classList.toggle("saved",nowSaved);
+  });
+
+  grid.appendChild(node);
+}
+
+function setActiveSectionNav(sectionName) {
+  document.querySelectorAll("#sectionNav button").forEach(btn => {
+    btn.classList.toggle(
+      "active",
+      sectionName
+        ? NAV_SECTIONS.find(x => x[1] === sectionName)?.[0] === btn.textContent
+        : btn.textContent === "Home"
+    );
+  });
+}
+
+function renderSectionView(sectionName) {
+  const stories = editionStories().filter(x => x.section === sectionName);
+  document.getElementById("lead").innerHTML = "";
+  document.getElementById("briefing").innerHTML = `
+    <div class="section-view-header">
+      <button class="section-back" id="sectionBack">← Front Page</button>
+      <div class="kicker">SECTION</div>
+      <h2>${sectionName}</h2>
+      <p>${stories.length} ${stories.length === 1 ? "story" : "stories"} in this ${currentEditionType} edition.</p>
+    </div>
+  `;
+
+  const grid=document.getElementById("sectionGrid");
+  grid.innerHTML="";
+  stories.forEach(story => appendStoryCard(grid,story,{showSection:false}));
+
+  document.getElementById("sectionBack")?.addEventListener("click",()=>{
+    renderEdition(currentEdition,currentIsLive);
+    setActiveSectionNav(null);
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+  setActiveSectionNav(sectionName);
+}
+
 function renderSavedView() {
   const items = getSaved();
   document.getElementById("lead").innerHTML = "";
@@ -273,20 +367,22 @@ function renderSectionsView() {
   document.getElementById("briefing").innerHTML = `
     <div class="kicker">SECTIONS</div>
     <h2>Browse the Paper</h2>
-    <p>Jump directly to the beats in your personal edition.</p>
+    <p>Open a section to see everything that made this edition, not just the front-page selections.</p>
   `;
+
   const grid=document.getElementById("sectionGrid");
   grid.innerHTML="";
-  const names=[...new Set(currentEdition.stories.map(x=>x.section))];
+  const rows=editionStories();
+  const names=[...new Set(rows.map(x=>x.section).filter(Boolean))];
+
   names.forEach(name=>{
     const article=document.createElement("article");
     article.className="section-tile";
-    article.innerHTML=`<div class="kicker">${name}</div><h3>${currentEdition.stories.filter(x=>x.section===name).length} stories</h3>`;
+    const count=rows.filter(x=>x.section===name).length;
+    article.innerHTML=`<div class="kicker">${name}</div><h3>${count} ${count===1 ? "story" : "stories"}</h3><p>Open section →</p>`;
     article.onclick=()=>{
-      renderEdition(currentEdition,currentIsLive);
-      setTimeout(()=>{
-        [...document.querySelectorAll(".story-card")].find(c=>c.dataset.section===name)?.scrollIntoView({behavior:"smooth",block:"start"});
-      },0);
+      renderSectionView(name);
+      window.scrollTo({top:0,behavior:"smooth"});
     };
     grid.appendChild(article);
   });
@@ -348,46 +444,8 @@ function renderEdition(edition, live) {
     btn.classList.toggle("saved",nowSaved);
   });
 
-  edition.stories.forEach(story => {
-    const node = tpl.content.cloneNode(true);
-    const card = node.querySelector(".story-card");
-    card.dataset.section = story.section;
-    card.dataset.link = story.url ? "true" : "false";
-    node.querySelector(".story-kicker").textContent = story.section;
-    if (story.image) {
-      const img = document.createElement("img");
-      img.className = "story-image";
-      img.src = story.image;
-      img.alt = "";
-      img.loading = "lazy";
-      img.referrerPolicy = "no-referrer";
-      card.insertBefore(img, node.querySelector("h3"));
-    }
-    const h3 = node.querySelector("h3");
-    if (story.url) {
-      const a = document.createElement("a");
-      a.href = story.url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = story.title;
-      h3.appendChild(a);
-    } else {
-      h3.textContent = story.title;
-    }
-    const deck = node.querySelector(".story-deck");
-    deck.textContent = story.deck || "";
-    if (!story.deck) deck.style.display = "none";
-    node.querySelector(".story-meta").innerHTML =
-      `<span class="story-source">${story.source}</span>${story.age ? ` · ${story.age}` : ""}<span class="editorial-badge">${story.type || "News"}</span><button class="inline-save">${isSaved(story) ? "Saved" : "Save"}</button>`;
-    const saveBtn=node.querySelector(".inline-save");
-    saveBtn?.addEventListener("click",(e)=>{
-      e.preventDefault();e.stopPropagation();
-      const nowSaved=toggleSaved(story);
-      saveBtn.textContent=nowSaved ? "Saved" : "Save";
-      saveBtn.classList.toggle("saved",nowSaved);
-    });
-    grid.appendChild(node);
-  });
+  edition.stories.forEach(story => appendStoryCard(grid, story));
+
 }
 
 
@@ -408,7 +466,7 @@ function editionSignature(editions) {
   for (const key of ["morning","evening"]) {
     const ed = editions[key];
     if (!ed) continue;
-    parts.push(key, ed.date || "", ed.lead?.title || "", String(ed.stories?.length || 0));
+    parts.push(key, ed.date || "", ed.lead?.title || "", String(ed.allStories?.length || ed.stories?.length || 0));
   }
   return parts.join("|");
 }
