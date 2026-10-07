@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "sources": [
     {
       "id": "popville",
@@ -301,6 +301,18 @@
       "editorial_type": "newsletter",
       "enabled": true,
       "notes": "User-preferred cooking source. Notes from the Test Kitchen/newsletter ingestion preferred."
+    },
+    {
+      "id": "capital_weather_forecast",
+      "name": "Capital Weather",
+      "beat": "weather",
+      "type": "web",
+      "url": "https://www.capitalweather.com/",
+      "priority": "preferred",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Daily DC-area forecast; guaranteed morning-edition weather item."
     }
   ]
 }
