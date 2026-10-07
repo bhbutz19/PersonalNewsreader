@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "sources": [
     {
       "id": "popville",
@@ -318,13 +318,13 @@
       "id": "washingtonian_news",
       "name": "Washingtonian — News & Politics",
       "beat": "dc_local",
-      "type": "rss",
-      "url": "https://washingtonian.com/feed/",
+      "type": "web",
+      "url": "https://washingtonian.com/sections/news/",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true,
+      "enabled": false,
       "min_interval_minutes": 60,
-      "notes": "Washingtonian publishes RSS. General feed used initially; DC section diversity logic prevents dominance."
+      "notes": "Collected by dedicated News & Politics page scraper because direct RSS requests return 403."
     },
     {
       "id": "reddit_washingtondc",
