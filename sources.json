@@ -1,5 +1,5 @@
 {
-  "version": 10,
+  "version": 11,
   "sources": [
     {
       "id": "popville",
@@ -313,6 +313,74 @@
       "enabled": true,
       "min_interval_minutes": 30,
       "notes": "Daily DC-area forecast; guaranteed morning-edition weather item."
+    },
+    {
+      "id": "washingtonian_news",
+      "name": "Washingtonian — News & Politics",
+      "beat": "dc_local",
+      "type": "rss",
+      "url": "https://washingtonian.com/feed/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 60,
+      "notes": "Washingtonian publishes RSS. General feed used initially; DC section diversity logic prevents dominance."
+    },
+    {
+      "id": "reddit_washingtondc",
+      "name": "Reddit — r/washingtondc new",
+      "beat": "dc_local",
+      "type": "rss",
+      "url": "https://www.reddit.com/r/washingtondc/new/.rss",
+      "priority": "conversation",
+      "editorial_type": "social",
+      "enabled": true,
+      "min_interval_minutes": 180,
+      "notes": "Conversation/community signal only; never authoritative for factual claims."
+    },
+    {
+      "id": "wamu_dc",
+      "name": "WAMU / DCist",
+      "beat": "dc_local",
+      "type": "email",
+      "url": "https://wamu.org/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "notes": "Use WAMU newsletter/email ingestion for local reporting."
+    },
+    {
+      "id": "not_bored_dc",
+      "name": "Not Bored in DC",
+      "beat": "dc_local",
+      "type": "email",
+      "url": "https://newsletter.notboredindc.com/",
+      "priority": "preferred",
+      "editorial_type": "newsletter",
+      "enabled": true,
+      "notes": "User-selected local culture/events source; newsletter ingestion."
+    },
+    {
+      "id": "adams_morgan_groups",
+      "name": "Adams Morgan groups.io",
+      "beat": "dc_local",
+      "type": "email",
+      "url": "https://groups.io/g/adamsmorgan",
+      "priority": "conversation",
+      "editorial_type": "social",
+      "enabled": true,
+      "notes": "Neighborhood/community signal via email delivery from groups.io."
+    },
+    {
+      "id": "martin_austermuhle_x",
+      "name": "Martin Austermuhle on X",
+      "beat": "dc_local",
+      "type": "web_registry",
+      "url": "https://x.com/maustermuhle",
+      "priority": "preferred",
+      "editorial_type": "social",
+      "enabled": false,
+      "notes": "High-value DC reporter signal. Registered for future supported X ingestion; no stable public RSS endpoint."
     }
   ]
 }
