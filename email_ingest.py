@@ -284,11 +284,12 @@ def sync_email_sources(conn, rules):
             cur.execute("""
                 INSERT INTO sources
                   (source_id,name,beat,source_type,url,priority,editorial_type,enabled,updated_at)
-                VALUES (%s,%s,%s,'email',%s,'primary',%s,TRUE,NOW())
+                VALUES (%s,%s,%s,'email',%s,%s,%s,TRUE,NOW())
                 ON CONFLICT (source_id) DO UPDATE SET
                   name=EXCLUDED.name, beat=EXCLUDED.beat, url=EXCLUDED.url,
                   editorial_type=EXCLUDED.editorial_type, enabled=TRUE, updated_at=NOW()
             """, (source_id, rule["name"], rule["beat"], rule.get("homepage","https://mail.google.com/"),
+                  "preferred" if rule.get("must_carry") else "primary",
                   rule.get("editorial_type","newsletter")))
     conn.commit()
 
@@ -380,6 +381,7 @@ def main():
                             "forwarded": is_forwarded,
                             "original_sender": original_sender,
                             "extraction_version": 3,
+                            "must_carry": bool(rule.get("must_carry")),
                         }
                         with conn.cursor() as cur:
                             cur.execute("""
