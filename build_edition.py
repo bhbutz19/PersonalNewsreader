@@ -91,6 +91,39 @@ def row_to_story(r):
         "latest_seen":latest_seen.isoformat() if latest_seen else None
     }
 
+
+def diversify_by_source(rows, cap, per_source_cap=None):
+    """Keep score ordering while preventing one outlet from monopolizing a section."""
+    if not rows or cap <= 0:
+        return []
+    if not per_source_cap:
+        return rows[:cap]
+
+    chosen=[]
+    counts=defaultdict(int)
+
+    # First pass enforces the cap.
+    for r in rows:
+        source=r[9] or "Unknown"
+        if counts[source] >= per_source_cap:
+            continue
+        chosen.append(r)
+        counts[source]+=1
+        if len(chosen) >= cap:
+            return chosen
+
+    # If there are not enough alternative sources, fill remaining slots by score.
+    if len(chosen) < cap:
+        chosen_ids={r[0] for r in chosen}
+        for r in rows:
+            if r[0] in chosen_ids:
+                continue
+            chosen.append(r)
+            if len(chosen) >= cap:
+                break
+
+    return chosen
+
 def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=None):
     grouped=defaultdict(list)
 
@@ -122,8 +155,17 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
         pool=grouped.get(beat,[])
         reported=[r for r in pool if r[10] != "primary_source"]
         primary=[r for r in pool if r[10] == "primary_source"]
-        primary_cap = 1 if beat in {"us_politics","dc_politics"} else 1
-        selected=(reported[:cap] + primary[:primary_cap])[:cap]
+        primary_cap = 1
+
+        # Washington should read like a newspaper section, not a single-source feed.
+        # Keep no more than half the section from one outlet when alternatives exist.
+        source_cap = max(2, cap // 2) if beat == "dc_local" else None
+        reported_selected = diversify_by_source(
+            reported,
+            max(0, cap - min(primary_cap, len(primary))),
+            source_cap
+        )
+        selected=(reported_selected + primary[:primary_cap])[:cap]
         if not selected:
             continue
 
