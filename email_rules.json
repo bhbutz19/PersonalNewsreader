@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -87,6 +87,54 @@
       "max_article_links": 10,
       "title_reject_regex": "(?i)(OpenWeb|Download the app|all the new openings in Portland)",
       "notes": "Temporarily disabled: generic Eater/cooking newsletters are producing restaurant-industry/navigation noise. Replace with dedicated cooking sources."
+    },
+    {
+      "name": "J. Kenji López-Alt",
+      "source_id": "kenji_newsletter",
+      "homepage": "https://www.kenjilopezalt.com/",
+      "subject_regex": "(?i)(Kenji|Alt-Weekly|Frienji)",
+      "beat": "cooking",
+      "editorial_type": "newsletter",
+      "extract_articles": true,
+      "max_article_links": 12,
+      "must_carry": true,
+      "title_reject_regex": "(?i)^(manage |unsubscribe|view in browser|shop|buy |gift |join )"
+    },
+    {
+      "name": "Alton Brown",
+      "source_id": "alton_brown_newsletter",
+      "homepage": "https://altonbrown.com/",
+      "subject_regex": "(?i)(Alton Brown|Good Eats|AB newsletter)",
+      "beat": "cooking",
+      "editorial_type": "newsletter",
+      "extract_articles": true,
+      "max_article_links": 12,
+      "must_carry": true,
+      "title_reject_regex": "(?i)^(manage |unsubscribe|view in browser|shop|merch|tour|buy )"
+    },
+    {
+      "name": "America's Test Kitchen",
+      "source_id": "atk_newsletter",
+      "homepage": "https://www.americastestkitchen.com/",
+      "subject_regex": "(?i)(America.?s Test Kitchen|Notes from the Test Kitchen|Cook.?s Illustrated|Cook.?s Country)",
+      "beat": "cooking",
+      "editorial_type": "newsletter",
+      "extract_articles": true,
+      "max_article_links": 15,
+      "must_carry": true,
+      "title_reject_regex": "(?i)^(manage |unsubscribe|view in browser|renew|subscribe|gift )"
+    },
+    {
+      "name": "Kendra Vaculin — SCROUNGE",
+      "source_id": "kendra_scrounge_email",
+      "homepage": "https://scroungecooking.substack.com/",
+      "subject_regex": "(?i)(SCROUNGE|Kendra Vaculin)",
+      "beat": "cooking",
+      "editorial_type": "newsletter",
+      "extract_articles": true,
+      "max_article_links": 10,
+      "must_carry": true,
+      "title_reject_regex": "(?i)^(manage |unsubscribe|view in browser|subscribe)"
     }
   ],
   "link_filters": {
