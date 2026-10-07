@@ -119,6 +119,8 @@ def score_item(row, guide, now):
     importance = 12
     novelty = recency_points(published_at or fetched_at, now)
     source_q = guide["source_quality"].get(priority or "", 8)
+    if priority == "preferred":
+        source_q = 15
     local = local_points(beat)
     conversation = 5 if editorial_type == "social" else 1
 
@@ -130,9 +132,9 @@ def score_item(row, guide, now):
         reasons.append("primary source")
     if priority == "official":
         reasons.append("official source")
-    if metadata.get("must_carry"):
+    if metadata.get("must_carry") or priority == "preferred":
         personal += 25
-        reasons.append("must carry")
+        reasons.append("must carry / preferred source")
     if metadata.get("manual_pick"):
         personal += 10
         reasons.append("manual pick")
