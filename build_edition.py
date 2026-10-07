@@ -117,10 +117,12 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
 
     for beat in SECTION_ORDER:
         cap=int(caps.get(beat,4))
+        if edition_type=="evening":
+            cap=min(cap, 3)
         pool=grouped.get(beat,[])
         reported=[r for r in pool if r[10] != "primary_source"]
         primary=[r for r in pool if r[10] == "primary_source"]
-        primary_cap = 2 if beat in {"us_politics","dc_politics"} else 1
+        primary_cap = 1 if beat in {"us_politics","dc_politics"} else 1
         selected=(reported[:cap] + primary[:primary_cap])[:cap]
         if not selected:
             continue
