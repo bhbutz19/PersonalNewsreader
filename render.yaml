@@ -18,3 +18,7 @@ services:
         sync: false
       - key: GMAIL_LOOKBACK_DAYS
         value: "7"
+      - key: DEEPL_API_KEY
+        sync: false
+      - key: DEEPL_API_URL
+        value: https://api-free.deepl.com/v2/translate
