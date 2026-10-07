@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -142,6 +142,40 @@
       "max_article_links": 10,
       "must_carry": true,
       "title_reject_regex": "(?i)^(manage |unsubscribe|view in browser|subscribe)"
+    },
+    {
+      "name": "WAMU / DCist",
+      "source_id": "wamu_dc",
+      "homepage": "https://wamu.org/",
+      "subject_regex": "(?i)(WAMU|DCist|WAMU Insider)",
+      "beat": "dc_local",
+      "editorial_type": "reported_news",
+      "extract_articles": true,
+      "max_article_links": 18,
+      "title_reject_regex": "(?i)^(donate|support WAMU|manage |unsubscribe|view in browser|listen live|events?)"
+    },
+    {
+      "name": "Not Bored in DC",
+      "source_id": "not_bored_dc",
+      "homepage": "https://newsletter.notboredindc.com/",
+      "subject_regex": "(?i)(Not Bored in DC|Things to Do in DC)",
+      "beat": "dc_local",
+      "editorial_type": "newsletter",
+      "extract_articles": true,
+      "max_article_links": 14,
+      "must_carry": true,
+      "title_reject_regex": "(?i)^(subscribe|unsubscribe|manage |view in browser|forwarded this email)"
+    },
+    {
+      "name": "Adams Morgan groups.io",
+      "source_id": "adams_morgan_groups",
+      "homepage": "https://groups.io/g/adamsmorgan",
+      "subject_regex": "(?i)(\\[adamsmorgan\\]|adamsmorgan@groups\\.io|Adams Morgan)",
+      "beat": "dc_local",
+      "editorial_type": "social",
+      "extract_articles": true,
+      "max_article_links": 8,
+      "title_reject_regex": "(?i)^(unsubscribe|manage |view in browser|groups\\.io)"
     }
   ],
   "link_filters": {
