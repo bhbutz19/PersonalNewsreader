@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "sources": [
     {
       "id": "popville",
@@ -232,6 +232,30 @@
       "enabled": true,
       "min_interval_minutes": 30,
       "notes": "Official EL PAÍS España section RSS."
+    },
+    {
+      "id": "autosport_f1",
+      "name": "Autosport — Formula 1",
+      "beat": "f1",
+      "type": "rss",
+      "url": "https://www.autosport.com/rss/f1/news/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "r/formula1 source rating 3/3; official Autosport F1 RSS feed."
+    },
+    {
+      "id": "racefans_f1",
+      "name": "RaceFans — Formula 1",
+      "beat": "f1",
+      "type": "rss",
+      "url": "https://www.racefans.net/feed/",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 60,
+      "notes": "r/formula1 source rating 3/3; independent original F1 reporting. Feed may occasionally rate-limit; collector will record failures."
     }
   ]
 }
