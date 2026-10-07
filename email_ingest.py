@@ -233,6 +233,14 @@ def headline_like(title):
         return False
     return True
 
+def article_beat(rule, title):
+    beat = rule.get("beat") if rule else "unclassified_email"
+    for override in (rule or {}).get("beat_overrides", []):
+        pattern = override.get("title_regex")
+        if pattern and re.search(pattern, title or "", re.I):
+            return override.get("beat", beat)
+    return beat
+
 def source_title_allowed(rule, title):
     if not rule:
         return True
@@ -291,21 +299,29 @@ def sync_email_sources(conn, rules):
             """, (source_id, rule["name"], rule["beat"], rule.get("homepage","https://mail.google.com/"),
                   "preferred" if rule.get("must_carry") else "primary",
                   rule.get("editorial_type","newsletter")))
-            # Keep previously extracted newsletter stories aligned with intentional
-            # source-rule changes (for example moving Washington Sun into dc_local).
+            # Keep previously extracted newsletter stories aligned with
+            # source-rule changes, including article-level beat overrides.
             cur.execute("""
-                UPDATE items
-                SET beat=%s,
-                    editorial_type=%s
+                SELECT id,title
+                FROM items
                 WHERE source_id=%s
-                  AND (beat IS DISTINCT FROM %s OR editorial_type IS DISTINCT FROM %s)
-            """, (
-                rule["beat"],
-                rule.get("editorial_type","newsletter"),
-                source_id,
-                rule["beat"],
-                rule.get("editorial_type","newsletter")
-            ))
+            """, (source_id,))
+            existing_items = cur.fetchall()
+            for item_id, item_title in existing_items:
+                desired_beat = article_beat(rule, item_title)
+                cur.execute("""
+                    UPDATE items
+                    SET beat=%s,
+                        editorial_type=%s
+                    WHERE id=%s
+                      AND (beat IS DISTINCT FROM %s OR editorial_type IS DISTINCT FROM %s)
+                """, (
+                    desired_beat,
+                    rule.get("editorial_type","newsletter"),
+                    item_id,
+                    desired_beat,
+                    rule.get("editorial_type","newsletter")
+                ))
     conn.commit()
 
 def main():
@@ -422,6 +438,7 @@ def main():
                         if not source_title_allowed(rule, title):
                             continue
 
+                        article_beat_value = article_beat(rule, title)
                         item_fp = item_fingerprint(source_id, title, href)
                         item_meta = {
                             "channel": "email",
@@ -448,7 +465,7 @@ def main():
                                     fetched_at=NOW(),
                                     metadata=EXCLUDED.metadata
                             """, (
-                                item_fp,source_id,rule["name"],beat,editorial_type,title,href,
+                                item_fp,source_id,rule["name"],article_beat_value,editorial_type,title,href,
                                 sender_name or sender,received,"",message_id,json.dumps(item_meta)
                             ))
                             inserted_articles += cur.rowcount
