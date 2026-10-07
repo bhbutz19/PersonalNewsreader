@@ -399,24 +399,69 @@ function switchEdition() {
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
-async function boot() {
-  renderNav();
-  renderEdition(demoEdition, false);
+
+let refreshTimer = null;
+let lastLiveSignature = "";
+
+function editionSignature(editions) {
+  const parts = [];
+  for (const key of ["morning","evening"]) {
+    const ed = editions[key];
+    if (!ed) continue;
+    parts.push(key, ed.date || "", ed.lead?.title || "", String(ed.stories?.length || 0));
+  }
+  return parts.join("|");
+}
+
+async function refreshLiveEditions({forceRender=false} = {}) {
   try {
-    liveEditions = await fetchLiveEditions();
+    const updated = await fetchLiveEditions();
+    const sig = editionSignature(updated);
+    const changed = sig && sig !== lastLiveSignature;
+
+    liveEditions = updated;
+    lastLiveSignature = sig;
+
     const hour = new Date().getHours();
-    currentEditionType = (hour >= 17 && liveEditions.evening) ? "evening" : "morning";
-    const live = liveEditions[currentEditionType] || liveEditions.morning || liveEditions.evening;
-    if (live) renderEdition(live, true);
+    let preferred = (hour >= 17 && liveEditions.evening) ? "evening" : "morning";
+    if (!liveEditions[preferred]) preferred = liveEditions.morning ? "morning" : "evening";
+
+    if (forceRender || changed) {
+      currentEditionType = preferred;
+      const live = liveEditions[currentEditionType];
+      if (live) renderEdition(live, true);
+    }
+
     const pill=document.querySelector(".edition-pill");
     if (pill && liveEditions.morning && liveEditions.evening) {
       pill.classList.add("switchable");
       pill.title="Tap to switch editions";
-      pill.addEventListener("click", switchEdition);
+      if (!pill.dataset.bound) {
+        pill.addEventListener("click", switchEdition);
+        pill.dataset.bound="1";
+      }
     }
   } catch (err) {
-    console.error("Live edition unavailable; using demo.", err);
+    console.error("Live edition refresh failed.", err);
   }
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => refreshLiveEditions(), 15 * 60 * 1000);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refreshLiveEditions();
+  });
+
+  window.addEventListener("focus", () => refreshLiveEditions());
+}
+
+async function boot() {
+  renderNav();
+  renderEdition(demoEdition, false);
+  await refreshLiveEditions({forceRender:true});
+  startAutoRefresh();
 }
 
 document.querySelectorAll(".bottom-nav button").forEach(btn => {
