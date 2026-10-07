@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "sources": [
     {
       "id": "popville",
@@ -318,13 +318,13 @@
       "id": "washingtonian_news",
       "name": "Washingtonian — News & Politics",
       "beat": "dc_local",
-      "type": "web",
-      "url": "https://washingtonian.com/sections/news/",
+      "type": "email",
+      "url": "https://washingtonian.com/",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": false,
+      "enabled": true,
       "min_interval_minutes": 60,
-      "notes": "Collected by dedicated News & Politics page scraper because direct RSS requests return 403."
+      "notes": "Washingtonian blocks Render HTTP requests with 403. Use newsletter/email ingestion instead."
     },
     {
       "id": "reddit_washingtondc",
