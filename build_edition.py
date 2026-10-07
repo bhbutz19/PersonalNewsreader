@@ -19,7 +19,7 @@ if not DATABASE_URL:
 EASTERN=ZoneInfo("America/New_York")
 
 SECTION_ORDER=[
-    "dc_local","dc_politics","us_politics","dc_dining",
+    "dc_local","weather","dc_politics","us_politics","dc_dining",
     "milwaukee","wisconsin","wisconsin_politics","cedarburg",
     "packers","brewers","uwm","f1","spain","menorca","logrono",
     "real_estate","cooking","sailing"
@@ -27,6 +27,7 @@ SECTION_ORDER=[
 
 SECTION_NAMES={
     "dc_local":"Washington",
+    "weather":"Weather",
     "dc_politics":"D.C. Government & Politics",
     "us_politics":"National Politics",
     "dc_dining":"D.C. Dining",
