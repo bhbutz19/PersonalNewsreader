@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -58,12 +58,13 @@
       "name": "Washington Sun",
       "source_id": "email_washington_sun",
       "homepage": "https://www.washingtonsun.com/",
-      "subject_regex": "(What They’re Talking About|Campaign .*DC|PAC Off|Final Countdown)",
-      "beat": "us_politics",
+      "subject_regex": "(?i)(Washington Sun|What They’re Talking About|Campaign .*DC|PAC Off|Final Countdown)",
+      "beat": "dc_local",
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 15,
-      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)|(^the sun.?s .+ reports$)"
+      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)|(^the sun.?s .+ reports$)",
+      "notes": "Primary Washington source. Route into Washington section; source-diversity cap prevents any one local outlet from dominating."
     },
     {
       "name": "Politico",
