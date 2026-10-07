@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "sources": [
     {
       "id": "popville",
@@ -256,6 +256,51 @@
       "enabled": true,
       "min_interval_minutes": 60,
       "notes": "r/formula1 source rating 3/3; independent original F1 reporting. Feed may occasionally rate-limit; collector will record failures."
+    },
+    {
+      "id": "kendra_scrounge",
+      "name": "Kendra Vaculin — SCROUNGE",
+      "beat": "cooking",
+      "type": "rss",
+      "url": "https://scroungecooking.substack.com/feed",
+      "priority": "preferred",
+      "editorial_type": "newsletter",
+      "enabled": true,
+      "min_interval_minutes": 60,
+      "notes": "User-preferred cooking source; treat as must-carry when new."
+    },
+    {
+      "id": "kenji_newsletter",
+      "name": "J. Kenji López-Alt",
+      "beat": "cooking",
+      "type": "email",
+      "url": "https://www.kenjilopezalt.com/",
+      "priority": "preferred",
+      "editorial_type": "newsletter",
+      "enabled": true,
+      "notes": "User-preferred cooking source. Newsletter/email ingestion preferred; weekly recipes and Alt-Weekly."
+    },
+    {
+      "id": "alton_brown_newsletter",
+      "name": "Alton Brown",
+      "beat": "cooking",
+      "type": "email",
+      "url": "https://altonbrown.com/",
+      "priority": "preferred",
+      "editorial_type": "newsletter",
+      "enabled": true,
+      "notes": "User-preferred cooking source. Newsletter/email ingestion preferred."
+    },
+    {
+      "id": "atk_newsletter",
+      "name": "America's Test Kitchen",
+      "beat": "cooking",
+      "type": "email",
+      "url": "https://www.americastestkitchen.com/",
+      "priority": "preferred",
+      "editorial_type": "newsletter",
+      "enabled": true,
+      "notes": "User-preferred cooking source. Notes from the Test Kitchen/newsletter ingestion preferred."
     }
   ]
 }
