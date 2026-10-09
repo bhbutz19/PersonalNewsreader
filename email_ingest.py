@@ -264,6 +264,20 @@ def source_title_allowed(rule, title):
         return False
     return True
 
+def content_count_limit(rule, text, default_limit):
+    if not rule or not rule.get("use_email_content_counts"):
+        return default_limit
+    allowed = set(rule.get("allowed_content_types", []))
+    counts = {}
+    for key in ("articles","bulletins","press releases","events","property sales"):
+        m = re.search(rf"(\\d+)\\s+{re.escape(key)}", text or "", re.I)
+        if m:
+            counts[key] = int(m.group(1))
+    if not counts:
+        return default_limit
+    total = sum(counts.get(k, 0) for k in allowed)
+    return total if total > 0 else default_limit
+
 def item_fingerprint(source_id, title, url):
     # Newsletter tracking URLs change from send to send.  A stable source +
     # normalized headline fingerprint prevents the same story from becoming
@@ -454,13 +468,14 @@ def main():
                     source_id = rule["source_id"]
                     links = extract_links(msg, filters)
                     max_links = int(rule.get("max_article_links", 30))
+                    max_links = content_count_limit(rule, text, max_links)
                     links = links[:max_links]
                     print(
                         f"EMAIL {rule['name']}: {subject!r} -> {len(links)} headline candidates",
                         flush=True
                     )
 
-                    for title, href in links:
+                    for link_index, (title, href) in enumerate(links, start=1):
                         if title.lower() == subject.lower():
                             continue
                         if not source_title_allowed(rule, title):
@@ -477,6 +492,7 @@ def main():
                             "original_sender": original_sender,
                             "extraction_version": 3,
                             "must_carry": bool(rule.get("must_carry")),
+                            "newsletter_link_index": link_index,
                         }
 
                         with conn.cursor() as cur:
