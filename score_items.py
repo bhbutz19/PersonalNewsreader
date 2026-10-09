@@ -75,6 +75,14 @@ def editorially_usable(source_id, beat, title, url):
     if low in exact_junk:
         return False
 
+    # Press releases and PR-wire style copy are not editorially useful for this paper.
+    if (
+        low.startswith(("press release:", "news release:", "media release:"))
+        or " press release " in f" {low} "
+        or " news release " in f" {low} "
+    ):
+        return False
+
     fragment_prefixes=(
         "according to ","per the ","per ","to learn more ","from ",
         "read more from ","pic, via ","photo, via ","manage your preferences",
