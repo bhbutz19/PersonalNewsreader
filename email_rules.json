@@ -1,5 +1,5 @@
 {
-  "version": 10,
+  "version": 11,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -58,19 +58,21 @@
       "name": "Washington Sun",
       "source_id": "email_washington_sun",
       "homepage": "https://www.washingtonsun.com/",
-      "subject_regex": "(?i)(Washington Sun|What They’re Talking About|Campaign .*DC|PAC Off|Final Countdown)",
+      "subject_regex": "(?i)(Washington Sun|What They’re Talking About|PAC Off|Final Countdown|Catch Up on .*Washington Sun|Afternoon Sun)",
       "beat": "us_politics",
       "editorial_type": "reported_news",
       "extract_articles": true,
-      "max_article_links": 15,
-      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)|(^the sun.?s .+ reports$)",
-      "notes": "Mixed Washington/National source. Default to us_politics; route clearly D.C.-local stories to dc_local by article-level title rules.",
+      "max_article_links": 24,
+      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up|subscribe|presented by|browser view)|(^the sun.?s .+ reports$)",
+      "notes": "Mixed Washington/National source. Match by Washington Sun sender/domain as well as known subjects; exclude account/promo mail. Default to us_politics and route clearly local stories into dc_local.",
       "beat_overrides": [
         {
           "beat": "dc_local",
           "title_regex": "(?i)(\\bD\\.C\\.\\b|\\bDC Council\\b|\\bDistrict of Columbia\\b|\\bWMATA\\b|\\bMetro\\b|\\bMPD\\b|\\bDCPS\\b|\\bANC\\b|\\bWard [1-8]\\b|\\bBowser\\b|\\bD\\.C\\. government\\b|\\bDistrict government\\b|\\bWashington neighborhood\\b|\\bDupont\\b|\\bShaw\\b|\\bGeorgetown\\b|\\bCapitol Hill\\b|\\bNavy Yard\\b|\\bAdams Morgan\\b|\\bColumbia Heights\\b|\\bPetworth\\b|\\bAnacostia\\b|\\bNoMa\\b)"
         }
-      ]
+      ],
+      "sender_regex": "(?i)(washingtonsun|washsun)",
+      "subject_exclude_regex": "(?i)(subscribe|welcome to the washington sun|code to log in|receipt|account|password)"
     },
     {
       "name": "Politico",
