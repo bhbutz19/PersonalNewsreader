@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -9,7 +9,13 @@
       "beat": "milwaukee",
       "editorial_type": "reported_news",
       "extract_articles": true,
-      "max_article_links": 22
+      "max_article_links": 30,
+      "use_email_content_counts": true,
+      "allowed_content_types": [
+        "articles",
+        "bulletins"
+      ],
+      "notes": "Custom email includes articles, bulletins, press releases, events, and property sales. Only ingest articles + bulletins; exclude press releases and utility listings."
     },
     {
       "name": "WPR Wisconsin Today",
