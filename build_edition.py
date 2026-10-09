@@ -113,7 +113,8 @@ def diversify_by_source(rows, cap, per_source_cap=None):
         if len(chosen) >= cap:
             return chosen
 
-    # If there are not enough alternative sources, fill remaining slots by score.
+    # If there are not enough alternative sources, callers can choose whether
+    # to backfill from an already-capped outlet.
     if len(chosen) < cap:
         chosen_ids={r[0] for r in chosen}
         for r in rows:
@@ -160,12 +161,29 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
 
         # Washington should read like a newspaper section, not a single-source feed.
         # Keep no more than half the section from one outlet when alternatives exist.
-        source_cap = max(2, cap // 2) if beat == "dc_local" else None
+        source_cap = min(3, max(2, cap // 2)) if beat == "dc_local" else None
+        reported_target=max(0, cap - min(primary_cap, len(primary)))
         reported_selected = diversify_by_source(
             reported,
-            max(0, cap - min(primary_cap, len(primary))),
+            reported_target,
             source_cap
         )
+
+        # For Washington, never let one outlet exceed the local source cap just
+        # to fill empty slots. A shorter diverse section is better than a PoPville wall.
+        if beat == "dc_local" and source_cap:
+            strict=[]
+            counts=defaultdict(int)
+            for r in reported:
+                source=r[9] or "Unknown"
+                if counts[source] >= source_cap:
+                    continue
+                strict.append(r)
+                counts[source]+=1
+                if len(strict) >= reported_target:
+                    break
+            reported_selected=strict
+
         selected=(reported_selected + primary[:primary_cap])[:cap]
         if not selected:
             continue
