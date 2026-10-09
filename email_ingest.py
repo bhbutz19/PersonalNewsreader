@@ -190,10 +190,21 @@ def detect_forwarded(text, subject):
     return forwarded, original_sender
 
 def classify(subject, sender, rules):
-    hay = f"{subject}\n{sender}"
+    subject = subject or ""
+    sender = sender or ""
     for rule in rules:
-        pattern = rule.get("subject_regex")
-        if pattern and re.search(pattern, hay, re.I):
+        subject_pattern = rule.get("subject_regex")
+        sender_pattern = rule.get("sender_regex")
+        exclude_pattern = rule.get("subject_exclude_regex")
+
+        if exclude_pattern and re.search(exclude_pattern, subject, re.I):
+            continue
+
+        subject_match = bool(subject_pattern and re.search(subject_pattern, subject, re.I))
+        sender_match = bool(sender_pattern and re.search(sender_pattern, sender, re.I))
+
+        # A rule may match by subject, by sender, or by either when both are supplied.
+        if subject_match or sender_match:
             return rule
     return None
 
