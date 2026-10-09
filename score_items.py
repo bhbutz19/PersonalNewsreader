@@ -195,7 +195,7 @@ def main():
                 WHERE COALESCE(i.published_at,i.fetched_at) >= NOW() - INTERVAL '8 days'
                   AND NOT (
                     COALESCE(i.metadata->>'channel','')='email'
-                    AND COALESCE(i.metadata->>'extraction_version','1') <> '2'
+                    AND COALESCE(i.metadata->>'extraction_version','1') <> '3'
                   )
             """)
             rows = [r for r in cur.fetchall() if editorially_usable(r[1], r[3], r[5], None)]
