@@ -406,7 +406,29 @@ def main():
                     FROM email_messages
                     WHERE beat='unclassified_email'
                       AND received_at >= NOW() - INTERVAL '7 days'
-                      AND gmail_uid ~ '^[0-9]+
+                      AND gmail_uid ~ '^[0-9]+$'
+                    ORDER BY received_at DESC
+                    LIMIT 100
+                """)
+                retry_uids = [str(r[0]).encode() for r in cur.fetchall() if r and r[0]]
+
+            existing_uid_keys = {
+                u.decode() if isinstance(u, bytes) else str(u)
+                for u in uids
+            }
+            retry_added = 0
+            for retry_uid in retry_uids:
+                key = retry_uid.decode() if isinstance(retry_uid, bytes) else str(retry_uid)
+                if key not in existing_uid_keys:
+                    uids.append(retry_uid)
+                    existing_uid_keys.add(key)
+                    retry_added += 1
+
+            print(
+                f"GMAIL {mode}: {len(uids)} message(s) to inspect"
+                + (f" ({retry_added} recent unclassified retries)" if retry_added else ""),
+                flush=True
+            )
 
             for uidb in uids:
                 uid = uidb.decode()
