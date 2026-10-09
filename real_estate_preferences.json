@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "markets": {
     "menorca": {
       "transaction": "buy",
@@ -22,6 +22,47 @@
         "Also high priority: 3+ bedroom apartments in the town centers of Alaior or Es Mercadal at or below target budget.",
         "Elsewhere on Menorca: include only when pricing or property quality makes the listing unusually compelling.",
         "Prefer new listings, meaningful price reductions, larger homes, usable outdoor space, and properties needing only manageable renovation."
+      ]
+    },
+    "northern_spain": {
+      "transaction": "buy",
+      "region_label": "Northern Spain / Cantabria Coast",
+      "priority_area": {
+        "description": "Cantabria coast and nearby inland areas, roughly San Vicente de la Barquera through Santander, Santoña/Laredo and Castro Urdiales.",
+        "priority_locations": [
+          "San Vicente de la Barquera",
+          "Comillas",
+          "Santillana del Mar",
+          "Suances",
+          "Santander area",
+          "Santoña",
+          "Laredo",
+          "Castro Urdiales"
+        ],
+        "nearby_inland_ok": true,
+        "coast_proximity_priority": true
+      },
+      "island_wide_value_scan": false,
+      "broader_value_scan": "Include exceptional deals elsewhere along the nearby northern coast if they fit the farmhouse/beach profile.",
+      "property_types_priority": [
+        "farmhouse",
+        "country house",
+        "stone house",
+        "casa rural",
+        "casona",
+        "detached house with land"
+      ],
+      "min_bedrooms": 3,
+      "target_max_usd": 350000,
+      "fixer_upper_ok": true,
+      "renovation_preference": "Fixer-uppers are welcome when structure/location/price make the renovation worthwhile.",
+      "over_budget_rule": "Allow only if exceptional value, unusually close to the coast, substantial land, or clearly under-market.",
+      "ranking_notes": [
+        "Highest priority: 3+ bedroom farmhouse/country/stone house near the Cantabria coast at or below the target budget.",
+        "Strongly prefer properties within practical driving distance of a beach, even when slightly inland.",
+        "Fixer-uppers can rank highly when the purchase price leaves substantial room for renovation.",
+        "Boost land, stone construction, character, sea/coastal access, and meaningful price reductions.",
+        "Include standout bargains elsewhere along the nearby northern coast when they are unusually compelling."
       ]
     }
   }
