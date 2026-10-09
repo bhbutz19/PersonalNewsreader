@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "markets": {
+    "menorca": {
+      "transaction": "buy",
+      "priority_locations": [
+        "Alaior",
+        "Es Mercadal"
+      ],
+      "island_wide_value_scan": true,
+      "property_types_priority": [
+        "farmhouse",
+        "country house",
+        "rustic property",
+        "city-center apartment"
+      ],
+      "min_bedrooms": 3,
+      "target_max_usd": 350000,
+      "over_budget_rule": "allow only if exceptional value / unusually strong deal",
+      "ranking_notes": [
+        "Highest priority: 3+ bedroom farmhouse/country/rustic properties in or near Alaior or Es Mercadal at or below target budget.",
+        "Also high priority: 3+ bedroom apartments in the town centers of Alaior or Es Mercadal at or below target budget.",
+        "Elsewhere on Menorca: include only when pricing or property quality makes the listing unusually compelling.",
+        "Prefer new listings, meaningful price reductions, larger homes, usable outdoor space, and properties needing only manageable renovation."
+      ]
+    }
+  }
+}
