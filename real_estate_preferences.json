@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "markets": {
     "menorca": {
       "transaction": "buy",
@@ -15,8 +15,8 @@
         "city-center apartment"
       ],
       "min_bedrooms": 3,
-      "target_max_usd": 350000,
-      "over_budget_rule": "allow only if exceptional value / unusually strong deal",
+      "target_max_usd": 400000,
+      "over_budget_rule": "Allow only if exceptional value / unusually strong deal beyond the $400K target ceiling.",
       "ranking_notes": [
         "Highest priority: 3+ bedroom farmhouse/country/rustic properties in or near Alaior or Es Mercadal at or below target budget.",
         "Also high priority: 3+ bedroom apartments in the town centers of Alaior or Es Mercadal at or below target budget.",
@@ -53,10 +53,10 @@
         "detached house with land"
       ],
       "min_bedrooms": 3,
-      "target_max_usd": 350000,
+      "target_max_usd": 400000,
       "fixer_upper_ok": true,
       "renovation_preference": "Fixer-uppers are welcome when structure/location/price make the renovation worthwhile.",
-      "over_budget_rule": "Allow only if exceptional value, unusually close to the coast, substantial land, or clearly under-market.",
+      "over_budget_rule": "Allow only if exceptional value / unusually strong deal beyond the $400K target ceiling.",
       "ranking_notes": [
         "Highest priority: 3+ bedroom farmhouse/country/stone house near the Cantabria coast at or below the target budget.",
         "Strongly prefer properties within practical driving distance of a beach, even when slightly inland.",
