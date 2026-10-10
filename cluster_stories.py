@@ -86,7 +86,7 @@ def main():
                 WHERE COALESCE(i.published_at,i.fetched_at) >= NOW() - INTERVAL '4 days'
                   AND NOT (
                     COALESCE(i.metadata->>'channel','')='email'
-                    AND COALESCE(i.metadata->>'extraction_version','1') <> '2'
+                    AND COALESCE(i.metadata->>'extraction_version','1') <> '3'
                   )
                 ORDER BY i.beat, es.score DESC, ts DESC
             """)
