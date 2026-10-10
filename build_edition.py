@@ -155,6 +155,20 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
         if edition_type=="evening":
             cap=min(cap, 3)
         pool=grouped.get(beat,[])
+
+        # The morning paper should feel current. Prefer stories updated in the
+        # last 24 hours; retain 24–48h stories only as lower-priority fill.
+        if edition_type=="morning":
+            fresh_cutoff=now_utc - dt.timedelta(hours=24)
+            pool=sorted(
+                pool,
+                key=lambda r: (
+                    0 if (r[7] and r[7] >= fresh_cutoff) else 1,
+                    -(r[3] or 0),
+                    -(r[7].timestamp() if r[7] else 0)
+                )
+            )
+
         reported=[r for r in pool if r[10] != "primary_source"]
         primary=[r for r in pool if r[10] == "primary_source"]
         primary_cap = 1
