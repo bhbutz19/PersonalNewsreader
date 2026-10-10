@@ -151,8 +151,27 @@ def score_item(row, guide, now):
         reasons.append("original reporting")
 
     low = (title or "").lower()
-    if any(x in low for x in ("breaking", "announces", "approved", "votes", "wins", "loss", "injury", "opens", "opening", "closes", "closed")):
+
+    # Importance should reflect public impact, not generic headline verbs.
+    # In particular, "opening" used to match "reopening" and gave routine
+    # local-business stories the same +4 boost as genuinely consequential news.
+    if re.search(r"\\b(breaking|approved|votes?|wins?|loss|injury|injured|closes?|closed)\\b", low):
         importance += 4
+        reasons.append("high-impact event signal")
+    elif re.search(r"\\bannounces?\\b", low):
+        importance += 2
+
+    # Routine commercial openings/reopenings are useful local information, but
+    # they should not compete with major civic/public-impact news for the lead.
+    if beat == "dc_local" and re.search(r"\\b(reopens?|reopening|opens?|opening)\\b", low):
+        civic_terms = (
+            "metro", "wmata", "station", "bridge", "road", "school", "hospital",
+            "government", "council", "police", "fire", "airport", "library"
+        )
+        if not any(term in low for term in civic_terms):
+            importance -= 6
+            reasons.append("routine local opening/reopening penalty")
+
     if any(x in low for x in ("opinion", "sponsored", "advertisement")):
         importance -= 10
         reasons.append("promotional/opinion penalty")
