@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "markets": {
     "menorca": {
       "transaction": "buy",
@@ -22,7 +22,8 @@
         "Also high priority: 3+ bedroom apartments in the town centers of Alaior or Es Mercadal at or below target budget.",
         "Elsewhere on Menorca: include only when pricing or property quality makes the listing unusually compelling.",
         "Prefer new listings, meaningful price reductions, larger homes, usable outdoor space, and properties needing only manageable renovation."
-      ]
+      ],
+      "target_max_eur": 400000
     },
     "northern_spain": {
       "transaction": "buy",
@@ -63,7 +64,8 @@
         "Fixer-uppers can rank highly when the purchase price leaves substantial room for renovation.",
         "Boost land, stone construction, character, sea/coastal access, and meaningful price reductions.",
         "Include standout bargains elsewhere along the nearby northern coast when they are unusually compelling."
-      ]
+      ],
+      "target_max_eur": 400000
     }
   }
 }
