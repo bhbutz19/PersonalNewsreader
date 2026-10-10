@@ -124,9 +124,20 @@ function toViewModel(record) {
   // Preserve every story in the edition for section pages.
   const allStories = rows.map(asStory);
 
-  // Prefer Washington/local for the lead; otherwise take the highest-ranked story.
-  const leadRow = rows.find(x => x.beat === "dc_local")
-    || [...rows].sort((a,b) => (b.score || 0) - (a.score || 0))[0];
+  // Choose the strongest news story for the lead rather than automatically
+  // promoting the first Washington item. Washington gets only a small tie-break
+  // preference; weather, social posts, and raw primary documents cannot lead.
+  const leadCandidates = rows.filter(x =>
+    x.beat !== "weather"
+    && x.editorial_type !== "social"
+    && x.editorial_type !== "primary_source"
+  );
+  const leadRow = [...(leadCandidates.length ? leadCandidates : rows)].sort((a,b) => {
+    const aLeadScore = (a.score || 0) + (a.beat === "dc_local" ? 2 : 0);
+    const bLeadScore = (b.score || 0) + (b.beat === "dc_local" ? 2 : 0);
+    if (bLeadScore !== aLeadScore) return bLeadScore - aLeadScore;
+    return new Date(b.latest_seen || 0) - new Date(a.latest_seen || 0);
+  })[0];
 
   const remaining = rows.filter(x => x !== leadRow);
 
