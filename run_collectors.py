@@ -12,6 +12,7 @@ def run_stage(name, command):
 run_stage("RSS_WEB", [sys.executable, "-u", "ingest.py"])
 run_stage("WEATHER", [sys.executable, "-u", "ingest_capital_weather.py"])
 run_stage("GMAIL", [sys.executable, "-u", "email_ingest.py"])
+run_stage("IDEALISTA", [sys.executable, "-u", "ingest_idealista.py"])
 run_stage("TRANSLATE", [sys.executable, "-u", "translate_items.py"])
 run_stage("SCORE", [sys.executable, "-u", "score_items.py"])
 run_stage("CLUSTER", [sys.executable, "-u", "cluster_stories.py"])
