@@ -86,6 +86,9 @@ def row_to_story(r):
         "url":url,
         "summary":summary or "",
         "image_url":item_meta.get("image_url") or "",
+        "property_market":item_meta.get("property_market") or "",
+        "property_fit_score":item_meta.get("property_fit_score"),
+        "property_fit_reasons":item_meta.get("property_fit_reasons") or [],
         "item_count":item_count,
         "source_count":source_count,
         "first_seen":first_seen.isoformat() if first_seen else None,
@@ -199,6 +202,36 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
             reported_selected=strict
 
         selected=(reported_selected + primary[:primary_cap])[:cap]
+
+        # Property is one newspaper section fed by two distinct searches.
+        # When both markets have qualifying listings, guarantee representation
+        # from Menorca and Northern Spain before filling the remaining slots by rank.
+        if beat == "real_estate" and pool:
+            by_market=defaultdict(list)
+            for r in pool:
+                meta=r[13] or {}
+                market=meta.get("property_market") or "other"
+                by_market[market].append(r)
+
+            balanced=[]
+            used_ids=set()
+            for market in ("menorca","northern_spain"):
+                candidates=by_market.get(market,[])
+                if candidates:
+                    best=candidates[0]
+                    balanced.append(best)
+                    used_ids.add(best[0])
+
+            for r in pool:
+                if len(balanced) >= cap:
+                    break
+                if r[0] in used_ids:
+                    continue
+                balanced.append(r)
+                used_ids.add(r[0])
+
+            selected=balanced[:cap]
+
         if not selected:
             continue
 
