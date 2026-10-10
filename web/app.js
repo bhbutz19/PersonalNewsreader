@@ -129,6 +129,7 @@ function toViewModel(record) {
   // preference; weather, social posts, and raw primary documents cannot lead.
   const leadCandidates = rows.filter(x =>
     x.beat !== "weather"
+    && x.beat !== "real_estate"
     && x.editorial_type !== "social"
     && x.editorial_type !== "primary_source"
   );
@@ -142,6 +143,7 @@ function toViewModel(record) {
   const remaining = rows.filter(x => x !== leadRow);
 
   const brief = [...remaining]
+    .filter(x => x.beat !== "real_estate" && x.beat !== "weather" && x.editorial_type !== "social")
     .sort((a,b) => (b.score || 0) - (a.score || 0))
     .slice(0, 3)
     .map(x => x.summary || x.title);
