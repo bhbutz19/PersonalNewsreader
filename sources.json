@@ -1,5 +1,5 @@
 {
-  "version": 13,
+  "version": 14,
   "sources": [
     {
       "id": "popville",
@@ -381,6 +381,28 @@
       "editorial_type": "social",
       "enabled": false,
       "notes": "High-value DC reporter signal. Registered for future supported X ingestion; no stable public RSS endpoint."
+    },
+    {
+      "id": "idealista_menorca",
+      "name": "Idealista — Menorca",
+      "beat": "real_estate",
+      "type": "email",
+      "url": "https://www.idealista.com/en/venta-viviendas/balears-illes/menorca/",
+      "priority": "primary",
+      "editorial_type": "listing",
+      "enabled": true,
+      "notes": "Saved-search alerts parsed by ingest_idealista.py; deduped by Idealista listing ID."
+    },
+    {
+      "id": "idealista_northern_spain",
+      "name": "Idealista — Northern Spain",
+      "beat": "real_estate",
+      "type": "email",
+      "url": "https://www.idealista.com/",
+      "priority": "primary",
+      "editorial_type": "listing",
+      "enabled": true,
+      "notes": "Cantabria/northern coast saved-search alerts parsed by ingest_idealista.py; deduped by Idealista listing ID."
     }
   ]
 }
