@@ -137,13 +137,16 @@ def listing_anchor(soup):
         listing_id = m.group(1)
         if listing_id in seen:
             continue
-        seen.add(listing_id)
         title = " ".join(a.stripped_strings).strip()
         low = title.lower()
         if not title or re.match(r"^(see \d+ photo|contact|view|more info)", low):
             continue
         if " in " not in low and not re.search(r"\b(house|home|apartment|flat|estate|villa|chalet|farm|property)\b", low):
             continue
+
+        # Idealista places a photo link before the title link for the same
+        # listing. Only mark the ID as seen after we have a usable title.
+        seen.add(listing_id)
         return listing_id, href, title
     return None, None, ""
 
