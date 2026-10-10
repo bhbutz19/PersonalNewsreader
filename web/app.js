@@ -58,7 +58,8 @@ const NAV_SECTIONS = [
   ["Packers", "PACKERS"],
   ["Brewers", "BREWERS"],
   ["F1", "FORMULA 1"],
-  ["Spain", "SPAIN"]
+  ["Spain", "SPAIN"],
+  ["Property", "PROPERTY"]
 ];
 
 function titleCaseEditorialType(value) {
@@ -118,7 +119,9 @@ function toViewModel(record) {
     type: titleCaseEditorialType(row.editorial_type),
     url: row.url || "",
     image: row.image_url || "",
-    score: row.score || 0
+    score: row.score || 0,
+    propertyMarket: row.property_market || "",
+    propertyFitScore: row.property_fit_score ?? null
   });
 
   // Preserve every story in the edition for section pages.
@@ -149,15 +152,25 @@ function toViewModel(record) {
     .map(x => x.summary || x.title);
 
   // Front page remains deliberately selective: max two stories per beat.
+  // Reserve two slots for Property when listings are present so that this
+  // intentional section cannot disappear simply because it sits late in
+  // the backend section order.
   const stories = [];
   const perSection = new Map();
+  const propertyRows = remaining.filter(x => x.beat === "real_estate").slice(0, 2);
+  const normalLimit = propertyRows.length ? 18 - propertyRows.length : 18;
 
   for (const row of remaining) {
+    if (row.beat === "real_estate") continue;
     const count = perSection.get(row.beat) || 0;
     if (count >= 2) continue;
     stories.push(asStory(row));
     perSection.set(row.beat, count + 1);
-    if (stories.length >= 18) break;
+    if (stories.length >= normalLimit) break;
+  }
+
+  for (const row of propertyRows) {
+    stories.push(asStory(row));
   }
 
   return {
@@ -268,7 +281,14 @@ function appendStoryCard(grid, story, {showSection=true} = {}) {
   card.dataset.link = story.url ? "true" : "false";
 
   const kicker=node.querySelector(".story-kicker");
-  kicker.textContent = showSection ? (story.section || "") : (story.type || "Story");
+  const marketLabel = story.propertyMarket === "menorca"
+    ? "MENORCA"
+    : story.propertyMarket === "northern_spain"
+      ? "NORTHERN SPAIN"
+      : "";
+  kicker.textContent = showSection
+    ? (story.section === "PROPERTY" && marketLabel ? `PROPERTY · ${marketLabel}` : (story.section || ""))
+    : (story.section === "PROPERTY" && marketLabel ? marketLabel : (story.type || "Story"));
 
   if (story.image) {
     const img = document.createElement("img");
