@@ -136,6 +136,22 @@ def score_item(row, guide, now):
     eq = guide["editorial_quality"].get(editorial_type or "", 2)
     importance += eq
 
+    # Property listings use a fit score derived from the user's saved-search
+    # preferences rather than generic news importance. Keep them strong enough
+    # to rank well inside Property without letting listings dominate news.
+    if beat == "real_estate":
+        try:
+            property_fit = max(0, min(100, int(metadata.get("property_fit_score", 50))))
+        except Exception:
+            property_fit = 50
+        personal = 20 + round(property_fit * 0.10)
+        importance = 6 + round(property_fit * 0.14)
+        if metadata.get("event_type") == "price_reduction":
+            importance += 3
+        local = 4 + round(property_fit * 0.06)
+        conversation = 0
+        reasons.append(f"property fit {property_fit}/100")
+
     if editorial_type == "primary_source":
         importance += 2
         reasons.append("primary source")
