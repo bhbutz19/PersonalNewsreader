@@ -2,12 +2,18 @@
 import subprocess
 import sys
 
+STAGE_TIMEOUTS = {"IDEALISTA": 240, "GMAIL": 600}
+
 def run_stage(name, command):
     print(f"=== START {name} ===", flush=True)
-    result = subprocess.run(command, check=False)
+    try:
+        result = subprocess.run(command, check=False, timeout=STAGE_TIMEOUTS.get(name, 900))
+    except subprocess.TimeoutExpired:
+        print(f"=== TIMEOUT {name}: continuing to next stage ===", flush=True)
+        return
     print(f"=== END {name} exit={result.returncode} ===", flush=True)
     if result.returncode != 0:
-        sys.exit(result.returncode)
+        print(f"=== WARNING {name} failed; continuing ===", flush=True)
 
 run_stage("RSS_WEB", [sys.executable, "-u", "ingest.py"])
 run_stage("WEATHER", [sys.executable, "-u", "ingest_capital_weather.py"])
