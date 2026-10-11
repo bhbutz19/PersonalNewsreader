@@ -1,5 +1,5 @@
 {
-  "version": 16,
+  "version": 17,
   "sources": [
     {
       "id": "popville",
@@ -448,9 +448,9 @@
       "url": "https://news.google.com/rss/search?q=when:24h+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true,
+      "enabled": false,
       "min_interval_minutes": 30,
-      "notes": "Google News discovery feed restricted to Reuters; links ultimately point to Reuters reporting."
+      "notes": "Google News discovery feed restricted to Reuters; links ultimately point to Reuters reporting. Disabled because Google News RSS returns HTTP 503 from Render cloud IPs."
     },
     {
       "id": "ap_via_google",
@@ -460,9 +460,9 @@
       "url": "https://news.google.com/rss/search?q=when:24h+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
       "priority": "primary",
       "editorial_type": "reported_news",
-      "enabled": true,
+      "enabled": false,
       "min_interval_minutes": 30,
-      "notes": "Google News discovery feed restricted to Associated Press; used for broad breaking-news coverage."
+      "notes": "Google News discovery feed restricted to Associated Press; used for broad breaking-news coverage. Disabled because Google News RSS returns HTTP 503 from Render cloud IPs."
     },
     {
       "id": "google_news_top",
@@ -472,9 +472,9 @@
       "url": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
       "priority": "conversation",
       "editorial_type": "reported_news",
-      "enabled": true,
+      "enabled": false,
       "min_interval_minutes": 30,
-      "notes": "Salience/discovery signal for stories receiving broad current coverage; lower source-quality weight than direct/original sources."
+      "notes": "Salience/discovery signal for stories receiving broad current coverage; lower source-quality weight than direct/original sources. Disabled because Google News RSS returns HTTP 503 from Render cloud IPs."
     },
     {
       "id": "bbc_world",
@@ -487,6 +487,30 @@
       "enabled": true,
       "min_interval_minutes": 30,
       "notes": "Direct BBC World news RSS used in the Top Stories layer as an independent international source alongside Reuters, AP and NPR."
+    },
+    {
+      "id": "guardian_world",
+      "name": "The Guardian — World",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://www.theguardian.com/world/rss",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Direct Guardian World RSS for major international stories; replaces unreliable Google News aggregation."
+    },
+    {
+      "id": "guardian_us",
+      "name": "The Guardian — U.S. News",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://www.theguardian.com/us-news/rss",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Direct Guardian U.S. news RSS for major national stories outside the dedicated politics beat."
     }
   ]
 }
