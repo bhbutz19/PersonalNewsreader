@@ -134,11 +134,15 @@ def main():
                     key = f"{c['beat']}|{normalized}"
                 else:
                     key = f"{c['beat']}|item-{canonical[0]}"
+                coverage_bonus=min(6, max(0, len(c["sources"]) - 1) * 3)
+                cluster_score=min(100, c["score"] + coverage_bonus)
                 meta={
                     "canonical_source":canonical[4],
                     "editorial_type":canonical[7],
                     "url":canonical[8],
                     "normalized_title":normalized,
+                    "coverage_bonus":coverage_bonus,
+                    "independent_source_count":len(c["sources"]),
                 }
                 cur.execute("""
                     INSERT INTO story_clusters (
@@ -147,7 +151,7 @@ def main():
                     )
                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,NOW())
                     RETURNING id
-                """,(key,c["beat"],canonical[0],c["title"],c["score"],len(c["items"]),
+                """,(key,c["beat"],canonical[0],c["title"],cluster_score,len(c["items"]),
                      len(c["sources"]),c["first_seen"],c["latest_seen"],json.dumps(meta)))
                 cid=cur.fetchone()[0]
                 for row,sim in c["items"]:
