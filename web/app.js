@@ -29,6 +29,7 @@ const demoEdition = {
 const SECTION_LABELS = {
   dc_local: "WASHINGTON",
   weather: "WEATHER",
+  top_news: "TOP STORIES",
   dc_politics: "D.C. POLITICS",
   us_politics: "NATIONAL",
   dc_dining: "D.C. DINING",
@@ -52,6 +53,7 @@ const NAV_SECTIONS = [
   ["Home", null],
   ["Washington", "WASHINGTON"],
   ["Weather", "WEATHER"],
+  ["Top Stories", "TOP STORIES"],
   ["National", "NATIONAL"],
   ["Dining", "D.C. DINING"],
   ["Milwaukee", "MILWAUKEE"],
