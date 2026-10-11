@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "weights": {
     "personal_relevance": 30,
     "importance": 25,
@@ -27,7 +27,8 @@
     "cooking": 18,
     "sailing": 18,
     "us_politics": 24,
-    "weather": 30
+    "weather": 30,
+    "top_news": 28
   },
   "source_quality": {
     "primary_source": 15,
@@ -60,7 +61,8 @@
     "real_estate": 5,
     "cooking": 4,
     "sailing": 4,
-    "weather": 1
+    "weather": 1,
+    "top_news": 6
   },
   "special_boosts": {
     "primary_source": 10,
