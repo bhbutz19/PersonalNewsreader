@@ -163,6 +163,14 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
         # last 24 hours; retain 24–48h stories only as lower-priority fill.
         if edition_type=="morning":
             fresh_cutoff=now_utc - dt.timedelta(hours=24)
+
+            # Washington is the most time-sensitive section in the morning paper.
+            # Do not backfill it with yesterday's neighborhood stories just to
+            # reach the section cap. A shorter fresh section is preferable.
+            if beat == "dc_local":
+                dc_cutoff=now_utc - dt.timedelta(hours=18)
+                pool=[r for r in pool if r[7] and r[7] >= dc_cutoff]
+
             pool=sorted(
                 pool,
                 key=lambda r: (
