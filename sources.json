@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "sources": [
     {
       "id": "popville",
@@ -475,6 +475,18 @@
       "enabled": true,
       "min_interval_minutes": 30,
       "notes": "Salience/discovery signal for stories receiving broad current coverage; lower source-quality weight than direct/original sources."
+    },
+    {
+      "id": "bbc_world",
+      "name": "BBC News — World",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Direct BBC World news RSS used in the Top Stories layer as an independent international source alongside Reuters, AP and NPR."
     }
   ]
 }
