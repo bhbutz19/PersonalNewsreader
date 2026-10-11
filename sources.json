@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "sources": [
     {
       "id": "popville",
@@ -403,6 +403,78 @@
       "editorial_type": "listing",
       "enabled": true,
       "notes": "Cantabria/northern coast saved-search alerts parsed by ingest_idealista.py; deduped by Idealista listing ID."
+    },
+    {
+      "id": "npr_politics",
+      "name": "NPR Politics",
+      "beat": "us_politics",
+      "type": "rss",
+      "url": "https://feeds.npr.org/1014/rss.xml",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Direct NPR Politics feed for current U.S. politics, Congress, White House and elections."
+    },
+    {
+      "id": "npr_top_news",
+      "name": "NPR News",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://feeds.npr.org/1001/rss.xml",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Broad major-news feed used for the Top Stories layer."
+    },
+    {
+      "id": "npr_world",
+      "name": "NPR World",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://feeds.npr.org/1004/rss.xml",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "International reporting used for major world stories."
+    },
+    {
+      "id": "reuters_via_google",
+      "name": "Reuters via Google News",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=when:24h+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Google News discovery feed restricted to Reuters; links ultimately point to Reuters reporting."
+    },
+    {
+      "id": "ap_via_google",
+      "name": "AP via Google News",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=when:24h+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+      "priority": "primary",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Google News discovery feed restricted to Associated Press; used for broad breaking-news coverage."
+    },
+    {
+      "id": "google_news_top",
+      "name": "Google News — Top Stories",
+      "beat": "top_news",
+      "type": "rss",
+      "url": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
+      "priority": "conversation",
+      "editorial_type": "reported_news",
+      "enabled": true,
+      "min_interval_minutes": 30,
+      "notes": "Salience/discovery signal for stories receiving broad current coverage; lower source-quality weight than direct/original sources."
     }
   ]
 }
