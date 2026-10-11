@@ -9,6 +9,8 @@ import imaplib
 import json
 import os
 import re
+import socket
+import time
 from email.header import decode_header, make_header
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -24,6 +26,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 LOOKBACK_DAYS = int(os.environ.get("GMAIL_LOOKBACK_DAYS", "7"))
+IMAP_TIMEOUT = int(os.environ.get("IDEALISTA_IMAP_TIMEOUT", "30"))
+MAX_MESSAGES = int(os.environ.get("IDEALISTA_MAX_MESSAGES", "500"))
 
 if not DATABASE_URL:
     raise SystemExit("DATABASE_URL is required")
@@ -293,20 +297,29 @@ def main():
     prefs_all = json.loads(PREFS_PATH.read_text(encoding="utf-8")).get("markets", {})
     cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=LOOKBACK_DAYS)).strftime("%d-%b-%Y")
 
-    mail = imaplib.IMAP4_SSL("imap.gmail.com")
+    print("IDEALISTA connecting to Gmail IMAP", flush=True)
+    mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=IMAP_TIMEOUT)
     parsed = updated = skipped = 0
     try:
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+        print("IDEALISTA authenticated", flush=True)
         mail.select("INBOX", readonly=True)
-        status, data = mail.uid("search", None, f'(SINCE "{cutoff}")')
+        print("IDEALISTA inbox selected", flush=True)
+        status, data = mail.uid("search", None, f'(SINCE "{cutoff}" OR FROM "idealista" SUBJECT "your search:")')
         if status != "OK":
             raise RuntimeError("Idealista Gmail search failed")
         uids = data[0].split() if data and data[0] else []
+        if MAX_MESSAGES > 0:
+            uids = uids[-MAX_MESSAGES:]
+        print(f"IDEALISTA matched={len(uids)} messages (limit={MAX_MESSAGES})", flush=True)
 
-        with psycopg.connect(DATABASE_URL, autocommit=False, prepare_threshold=None) as conn:
+        print("IDEALISTA connecting to database", flush=True)
+        with psycopg.connect(DATABASE_URL, autocommit=False, prepare_threshold=None, connect_timeout=15, options="-c statement_timeout=30000 -c lock_timeout=10000") as conn:
             ensure_sources(conn)
 
-            for uidb in uids:
+            for index, uidb in enumerate(uids, 1):
+                if index == 1 or index % 25 == 0:
+                    print(f"IDEALISTA processing {index}/{len(uids)}", flush=True)
                 uid = uidb.decode()
                 status, fetched = mail.uid("fetch", uid, "(BODY.PEEK[])")
                 if status != "OK" or not fetched:
@@ -446,6 +459,7 @@ def main():
                     updated += cur.rowcount
                 parsed += 1
 
+            print("IDEALISTA committing database changes", flush=True)
             conn.commit()
 
         print(f"IDEALISTA parsed={parsed} updated={updated} skipped={skipped}", flush=True)
