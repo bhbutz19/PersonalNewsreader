@@ -400,15 +400,31 @@ def main():
                 uids = [u for u in uids if u.isdigit() and int(u) > last_uid]
 
             # Revisit a bounded set of recent messages that were previously
-            # unclassified. This lets improved source rules recover newsletters
-            # we already fetched without resetting the mailbox checkpoint.
+            # unclassified. Retry each message only when the classification
+            # rules version has advanced, and keep the repair batch bounded.
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT gmail_uid
                     FROM email_messages
                     WHERE beat='unclassified_email'
                       AND received_at >= NOW() - INTERVAL '7 days'
-                      AND gmail_uid ~ '^[0-9]+
+                      AND gmail_uid ~ '^[0-9]+$'
+                      AND COALESCE(
+                            CASE
+                              WHEN metadata->>'classification_version' ~ '^[0-9]+$'
+                              THEN (metadata->>'classification_version')::int
+                              ELSE 0
+                            END,
+                            0
+                          ) < %s
+                    ORDER BY received_at DESC
+                    LIMIT 25
+                """, (rules_version,))
+                retry_uids = [
+                    str(r[0]).encode()
+                    for r in cur.fetchall()
+                    if r and r[0]
+                ]
 
             existing_uid_keys = {
                 u.decode() if isinstance(u, bytes) else str(u)
