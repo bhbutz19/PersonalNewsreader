@@ -1,5 +1,5 @@
 {
-  "version": 13,
+  "version": 14,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -88,8 +88,11 @@
       "beat": "us_politics",
       "editorial_type": "reported_news",
       "extract_articles": true,
-      "max_article_links": 18,
-      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)"
+      "max_article_links": 20,
+      "title_reject_regex": "(?i)^(pic,? via|photo,? via|download the app|listen now|read more|view online|manage |follow |sign up)",
+      "sender_regex": "(?i)politico",
+      "subject_exclude_regex": "(?i)(receipt|account|password|subscription confirmation)",
+      "notes": "Match POLITICO newsletters by sender/domain rather than a small hard-coded subject list; extract current national-politics headlines."
     },
     {
       "name": "Cooking",
