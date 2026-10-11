@@ -19,7 +19,7 @@ if not DATABASE_URL:
 EASTERN=ZoneInfo("America/New_York")
 
 SECTION_ORDER=[
-    "dc_local","weather","dc_politics","us_politics","dc_dining",
+    "dc_local","weather","top_news","dc_politics","us_politics","dc_dining",
     "milwaukee","wisconsin","wisconsin_politics","cedarburg",
     "packers","brewers","uwm","f1","spain","menorca","logrono",
     "real_estate","cooking","sailing"
@@ -28,6 +28,7 @@ SECTION_ORDER=[
 SECTION_NAMES={
     "dc_local":"Washington",
     "weather":"Weather",
+    "top_news":"Top Stories",
     "dc_politics":"D.C. Government & Politics",
     "us_politics":"National Politics",
     "dc_dining":"D.C. Dining",
@@ -186,7 +187,11 @@ def build_payload(rows, caps, edition_type, edition_date, now_utc, cutoff_utc=No
 
         # Washington should read like a newspaper section, not a single-source feed.
         # Keep no more than half the section from one outlet when alternatives exist.
-        source_cap = min(3, max(2, cap // 2)) if beat == "dc_local" else None
+        source_cap = (
+            min(3, max(2, cap // 2)) if beat == "dc_local"
+            else 2 if beat == "top_news"
+            else None
+        )
         reported_target=max(0, cap - min(primary_cap, len(primary)))
         reported_selected = diversify_by_source(
             reported,
