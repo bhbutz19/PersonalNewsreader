@@ -451,7 +451,8 @@ def main():
                 message_id = (msg.get("Message-ID") or "").strip()
                 text = body_text(msg)
                 is_forwarded, original_sender = detect_forwarded(text, subject)
-                rule = classify(subject, sender, rules)
+                classifier_sender = " ".join(x for x in (sender, original_sender) if x)
+                rule = classify(subject, classifier_sender, rules)
 
                 beat = rule.get("beat") if rule else "unclassified_email"
                 editorial_type = rule.get("editorial_type") if rule else "newsletter"
