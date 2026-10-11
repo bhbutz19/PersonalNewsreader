@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -189,12 +189,14 @@
       "name": "Washingtonian",
       "source_id": "washingtonian_news",
       "homepage": "https://washingtonian.com/",
-      "subject_regex": "(?i)(Washingtonian|News & Politics|The 100 Very Best|Things to Do|Washingtonian Today)",
+      "subject_regex": "(?i)(Washingtonian|News & Politics|The 100 Very Best|Things to Do|Washingtonian Today|Washington's Best Stories of the Week)",
       "beat": "dc_local",
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 18,
-      "title_reject_regex": "(?i)^(subscribe|unsubscribe|manage |view in browser|shop|advertise|events calendar|restaurants?)"
+      "title_reject_regex": "(?i)^(subscribe|unsubscribe|manage |view in browser|shop|advertise|events calendar|restaurants?)",
+      "sender_regex": "(?i)washingtonian",
+      "subject_exclude_regex": "(?i)(partner|sponsored|advertisement|subscription|receipt|account|password)"
     }
   ],
   "link_filters": {
