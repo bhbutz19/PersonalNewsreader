@@ -259,6 +259,9 @@ def source_title_allowed(rule, title):
     pattern = rule.get("title_reject_regex")
     if pattern and re.search(pattern, title or "", re.I):
         return False
+    min_len = int(rule.get("min_article_title_length", 0) or 0)
+    if min_len and len((title or "").strip()) < min_len:
+        return False
     # Newsletter story anchors should normally read like headlines, not sentence fragments.
     m = re.search(r"[A-Za-zÀ-ÿ]", title or "")
     if m and (title or "")[m.start()].islower():
