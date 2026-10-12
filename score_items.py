@@ -94,6 +94,19 @@ def editorially_usable(source_id, beat, title, url):
     if low.startswith(fragment_prefixes):
         return False
 
+    if source_id=="washingtonian_news":
+        washingtonian_junk_prefixes=(
+            "get washingtonian today", "play our new geography game",
+            "free subscription", "take washingtonian today",
+            "photo by ", "photograph by "
+        )
+        if low.startswith(washingtonian_junk_prefixes):
+            return False
+        if len(t) < 32:
+            return False
+        if re.search(r"\.(jpg|jpeg|png|gif)$", low):
+            return False
+
     if beat=="dc_dining":
         if any(x in low for x in (
             "best new restaurants in manhattan",
