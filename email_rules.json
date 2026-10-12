@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "rules": [
     {
       "name": "Urban Milwaukee",
@@ -197,9 +197,11 @@
       "editorial_type": "reported_news",
       "extract_articles": true,
       "max_article_links": 18,
-      "title_reject_regex": "(?i)^(subscribe|unsubscribe|manage |view in browser|shop|advertise|events calendar|restaurants?)",
+      "title_reject_regex": "(?i)^(subscribe|unsubscribe|manage |view in browser|shop|advertise|events calendar|restaurants?|get washingtonian today|play our new geography game|free subscription|take washingtonian today|photo by|photograph by|image by)|\\.(jpg|jpeg|png|gif)$",
       "sender_regex": "(?i)washingtonian",
-      "subject_exclude_regex": "(?i)(partner|sponsored|advertisement|subscription|receipt|account|password)"
+      "subject_exclude_regex": "(?i)(partner|sponsored|advertisement|subscription|receipt|account|password)",
+      "min_article_title_length": 32,
+      "notes": "Washingtonian newsletters: reject signup/utility/image-caption links and short inline phrase links. Weekly roundup headlines remain eligible."
     }
   ],
   "link_filters": {
